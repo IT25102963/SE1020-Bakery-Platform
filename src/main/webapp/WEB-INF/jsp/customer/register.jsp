@@ -64,7 +64,7 @@
 <div class="register-card">
     <h2>Create an Account</h2>
 
-    <form action="RegisterServlet" method="POST">
+    <form action="/registerCustomer" method="POST">
 
         <div class="form-group">
             <label>Full Name</label>
