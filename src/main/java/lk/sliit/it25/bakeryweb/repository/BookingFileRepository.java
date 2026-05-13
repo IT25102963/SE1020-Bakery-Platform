@@ -99,6 +99,7 @@ public class BookingFileRepository {
                 b.getCustomerName(),
                 b.getPhone(),
                 b.getCakeName(),
+                b.getOrderDetails(),
                 b.getOrderType(),
                 String.valueOf(b.getQuantity()),
                 b.getBookingDate() == null ? "" : b.getBookingDate().toString(),
@@ -114,12 +115,13 @@ public class BookingFileRepository {
         b.setCustomerName(parts.length > 1 ? parts[1] : "");
         b.setPhone(parts.length > 2 ? parts[2] : "");
         b.setCakeName(parts.length > 3 ? parts[3] : "");
-        b.setOrderType(parts.length > 4 ? parts[4] : "");
-        b.setQuantity(parts.length > 5 && !parts[5].isBlank() ? Integer.parseInt(parts[5]) : 0);
-        b.setBookingDate(parts.length > 6 && !parts[6].isBlank() ? LocalDate.parse(parts[6]) : null);
-        b.setDeliveryDate(parts.length > 7 && !parts[7].isBlank() ? LocalDate.parse(parts[7]) : null);
-        b.setTotalPrice(parts.length > 8 && !parts[8].isBlank() ? new BigDecimal(parts[8]) : BigDecimal.ZERO);
-        b.setStatus(parts.length > 9 ? parts[9] : "");
+        b.setOrderDetails(parts.length > 4 ? parts[4] : "");
+        b.setOrderType(parts.length > 5 ? parts[5] : "");
+        b.setQuantity(parts.length > 6 && !parts[6].isBlank() ? Integer.parseInt(parts[6]) : 0);
+        b.setBookingDate(parts.length > 7 && !parts[7].isBlank() ? LocalDate.parse(parts[7]) : null);
+        b.setDeliveryDate(parts.length > 8 && !parts[8].isBlank() ? LocalDate.parse(parts[8]) : null);
+        b.setTotalPrice(parts.length > 9 && !parts[9].isBlank() ? new BigDecimal(parts[9]) : BigDecimal.ZERO);
+        b.setStatus(parts.length > 10 ? parts[10] : "");
         return b;
     }
 }
