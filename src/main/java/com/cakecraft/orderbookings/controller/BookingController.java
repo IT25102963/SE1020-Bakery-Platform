@@ -1,7 +1,10 @@
 package com.cakecraft.orderbookings.controller;
 
 import com.cakecraft.orderbookings.model.Booking;
+import com.cakecraft.orderbookings.model.CartItem;
 import com.cakecraft.orderbookings.service.BookingService;
+import com.cakecraft.orderbookings.service.CartService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,9 +28,21 @@ import java.util.Optional;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final CartService cartService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, CartService cartService) {
         this.bookingService = bookingService;
+        this.cartService = cartService;
+    }
+
+    @ModelAttribute("cartCount")
+    public int cartCount(HttpSession session) {
+        return cartService.getCartCount(session);
+    }
+
+    @ModelAttribute("cartTotal")
+    public BigDecimal cartTotal(HttpSession session) {
+        return cartService.getCartTotal(session);
     }
 
     @ModelAttribute("statusOptions")
@@ -63,8 +79,7 @@ public class BookingController {
     @GetMapping("/new")
     public String showCreateForm(
             @RequestParam(value = "cakeName", required = false) String cakeName,
-            Model model
-    ) {
+            Model model) {
         Booking booking = new Booking();
         booking.setBookingDate(LocalDate.now());
         booking.setDeliveryDate(LocalDate.now().plusDays(1));
@@ -79,29 +94,103 @@ public class BookingController {
         return "booking-form";
     }
 
-    @PostMapping("/save")
+    @PostMapping("/place-order")
     public String saveBooking(
             @Valid @ModelAttribute("booking") Booking booking,
             BindingResult bindingResult,
             Model model,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
         if (bindingResult.hasErrors()) {
             booking.setBookingDate(LocalDate.now());
             booking.setDeliveryDate(LocalDate.now().plusDays(1));
-            booking.setTotalPrice(bookingService.calculateTotalPrice(booking.getCakeName(), booking.getQuantity()));
             model.addAttribute("booking", booking);
-            return "booking-form";
+            model.addAttribute("cartItems", cartService.getCart(session));
+            return "cart";
         }
 
-        Booking saved = bookingService.createBooking(booking);
-        redirectAttributes.addFlashAttribute("successMessage",
-                "Booking created successfully with ID " + saved.getBookingId());
+        // Process Checkout from Cart if it was a cart-based order
+        List<CartItem> cart = cartService.getCart(session);
+        if (!cart.isEmpty()) {
+            for (CartItem item : cart) {
+                Booking newBooking = new Booking();
+                newBooking.setCustomerName(booking.getCustomerName());
+                newBooking.setPhone(booking.getPhone());
+                newBooking.setOrderDetails(booking.getOrderDetails());
+                newBooking.setOrderType(booking.getOrderType());
+
+                newBooking.setCakeName(item.getCakeName());
+                newBooking.setQuantity(item.getQuantity());
+                newBooking.setTotalPrice(item.getSubTotal());
+
+                bookingService.createBooking(newBooking);
+            }
+            cartService.clearCart(session);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "All bookings from your cart have been placed successfully!");
+        } else {
+            // Fallback for single item booking
+            Booking saved = bookingService.createBooking(booking);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Booking created successfully with ID " + saved.getBookingId());
+        }
+
         return "redirect:/bookings/my-orders";
     }
 
+    @GetMapping("/place-order")
+    public String redirectToCatalog() {
+        return "redirect:/bookings/products";
+    }
+
+    // --- Cart Endpoints ---
+
+    @GetMapping("/cart")
+    public String viewCart(HttpSession session, Model model) {
+        List<CartItem> cart = cartService.getCart(session);
+        model.addAttribute("cartItems", cart);
+        
+        Booking checkoutInfo = new Booking();
+        checkoutInfo.setBookingDate(LocalDate.now());
+        checkoutInfo.setDeliveryDate(LocalDate.now().plusDays(1));
+        checkoutInfo.setOrderType("Standard");
+        model.addAttribute("booking", checkoutInfo);
+        
+        return "cart";
+    }
+
+    @PostMapping("/cart/update")
+    public String updateCartQuantity(
+            @RequestParam("cakeName") String cakeName,
+            @RequestParam("quantity") Integer quantity,
+            HttpSession session
+    ) {
+        cartService.updateQuantity(session, cakeName, quantity);
+        return "redirect:/bookings/cart";
+    }
+
+    @PostMapping("/cart/add")
+    public String addToCart(
+            @RequestParam("cakeName") String cakeName,
+            @RequestParam("quantity") Integer quantity,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        BigDecimal unitPrice = bookingService.getCakePrices().getOrDefault(cakeName, BigDecimal.ZERO);
+        CartItem item = new CartItem(cakeName, quantity, unitPrice);
+        cartService.addToCart(session, item);
+        redirectAttributes.addFlashAttribute("successMessage", cakeName + " added to your bag!");
+        return "redirect:/bookings/cart";
+    }
+
+    @GetMapping("/cart/remove/{cakeName}")
+    public String removeFromCart(@PathVariable("cakeName") String cakeName, HttpSession session) {
+        cartService.removeFromCart(session, cakeName);
+        return "redirect:/bookings/cart";
+    }
+
     @GetMapping("/receipt/{id}")
-    public String showReceipt(@PathVariable("id") String bookingId, Model model, RedirectAttributes redirectAttributes) {
+    public String showReceipt(@PathVariable("id") String bookingId, Model model,
+            RedirectAttributes redirectAttributes) {
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
@@ -112,7 +201,8 @@ public class BookingController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable("id") String bookingId, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditForm(@PathVariable("id") String bookingId, Model model,
+            RedirectAttributes redirectAttributes) {
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
@@ -129,8 +219,7 @@ public class BookingController {
             @Valid @ModelAttribute("booking") Booking booking,
             BindingResult bindingResult,
             Model model,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             booking.setBookingId(bookingId);
             bookingService.getBookingById(bookingId).ifPresent(existing -> {
@@ -153,7 +242,8 @@ public class BookingController {
     }
 
     @GetMapping("/status/{id}")
-    public String showStatusForm(@PathVariable("id") String bookingId, Model model, RedirectAttributes redirectAttributes) {
+    public String showStatusForm(@PathVariable("id") String bookingId, Model model,
+            RedirectAttributes redirectAttributes) {
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
@@ -168,8 +258,7 @@ public class BookingController {
     public String updateStatus(
             @PathVariable("id") String bookingId,
             @RequestParam("status") String status,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         boolean updated = bookingService.updateStatus(bookingId, status);
         if (updated) {
             redirectAttributes.addFlashAttribute("successMessage", "Booking status updated successfully");

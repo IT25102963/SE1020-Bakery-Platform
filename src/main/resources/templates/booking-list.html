@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Management | CakeForge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg cake-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/bookings/products}">
+            <img th:src="@{/theme/img/logo.png}" alt="CakeForge" class="brand-logo">
+            <span>CakeForge</span>
+        </a>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/products}">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/my-orders}">Bookings</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="page-header container">
+    <div class="d-flex justify-content-between align-items-end">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Manage all customer orders and production statuses.</p>
+        </div>
+        <div class="mb-2">
+            <a th:href="@{/bookings/products}" class="btn btn-warning rounded-pill"><i class="fa-solid fa-plus me-2"></i> New Catalog Order</a>
+        </div>
+    </div>
+</header>
+
+<main class="container py-4">
+    <!-- Stats Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-pink"><i class="fa-solid fa-cake-candles"></i></div>
+                <div class="stat-info">
+                    <h3 th:text="${bookings.size()}">0</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-green"><i class="fa-solid fa-check-double"></i></div>
+                <div class="stat-info">
+                    <h3>-</h3>
+                    <p>Ready for Delivery</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="stat-info">
+                    <h3>-</h3>
+                    <p>Pending Orders</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success glass-card border-0 mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${successMessage}"></span>
+    </div>
+
+    <div class="glass-card p-0 overflow-hidden">
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Recent Orders</h5>
+            <div class="input-group w-25">
+                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search orders...">
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Cake Details</th>
+                        <th>Delivery Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="booking : ${bookings}">
+                        <td><span class="badge bg-light text-dark border fw-bold" th:text="${booking.bookingId}"></span></td>
+                        <td>
+                            <div class="fw-bold" th:text="${booking.customerName}"></div>
+                            <small class="text-muted" th:text="${booking.phone}"></small>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-pink" th:text="${booking.cakeName}"></div>
+                            <small class="text-muted" th:text="${'Qty: ' + booking.quantity}"></small>
+                        </td>
+                        <td>
+                            <div th:text="${#temporals.format(booking.deliveryDate, 'MMM dd, yyyy')}"></div>
+                        </td>
+                        <td class="fw-bold" th:text="${'LKR ' + #numbers.formatDecimal(booking.totalPrice, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td>
+                            <span th:class="${'badge-status ' + 
+                                (booking.status == 'Pending' ? 'status-pending' : 
+                                 booking.status == 'Confirmed' ? 'status-confirmed' : 
+                                 booking.status == 'Delivered' ? 'status-delivered' : 'status-cancelled')}"
+                                  th:text="${booking.status}"></span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center">
+                                <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt"><i class="fa-solid fa-receipt"></i></a>
+                                <a th:href="@{/bookings/status/{id}(id=${booking.bookingId})}" class="btn-action btn-status" title="Update Status"><i class="fa-solid fa-gear"></i></a>
+                                <a th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}" class="btn-action btn-edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${bookings.empty}">
+                        <td colspan="7" class="text-center py-5 text-muted">No bookings found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

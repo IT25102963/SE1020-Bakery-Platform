@@ -23,20 +23,14 @@ public class Booking {
     @Pattern(regexp = "^0\\d{9}$", message = "Phone number must be 10 digits and start with 0")
     private String phone;
 
-    @NotBlank(message = "Cake name is required")
-    @Size(min = 2, max = 80, message = "Cake name must be between 2 and 80 characters")
     private String cakeName;
 
-    @NotBlank(message = "Order details are required")
-    @Size(max = 250, message = "Order details cannot exceed 250 characters")
     private String orderDetails;
 
     @NotBlank(message = "Order type is required")
     @Pattern(regexp = "^(Standard|Custom)$", message = "Order type must be Standard or Custom")
     private String orderType;
 
-    @NotNull(message = "Quantity is required")
-    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

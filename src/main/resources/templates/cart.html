@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Bag & Checkout | CakeForge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg cake-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/bookings/products}">
+            <img th:src="@{/theme/img/logo.png}" alt="CakeForge" class="brand-logo">
+            <span>CakeForge</span>
+        </a>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/products}">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/my-orders}">Bookings</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="page-header container">
+    <h1>Checkout</h1>
+    <p>Complete your order details and we'll start baking!</p>
+</header>
+
+<main class="container py-4">
+    <div th:if="${cartItems.empty}" class="glass-card text-center py-5">
+        <i class="fa-solid fa-cart-shopping fa-3x text-muted mb-3"></i>
+        <h3>Your bag is empty</h3>
+        <p class="text-muted">Browse our catalog and add some delicious cakes!</p>
+        <a th:href="@{/bookings/products}" class="btn btn-primary mt-3">Back to Catalog</a>
+    </div>
+
+    <div th:if="${!cartItems.empty}" class="row g-4">
+        <!-- Order Items -->
+        <div class="col-lg-7">
+            <div class="glass-card p-0 overflow-hidden mb-4">
+                <div class="p-3 bg-light border-bottom">
+                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th class="text-center" style="width: 120px;">Qty</th>
+                                <th class="text-end">Subtotal</th>
+                                <th class="text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${cartItems}">
+                                <td>
+                                    <div class="fw-bold" th:text="${item.cakeName}"></div>
+                                    <small class="text-muted" th:text="${'LKR ' + #numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}"></small>
+                                </td>
+                                <td>
+                                    <form th:action="@{/bookings/cart/update}" method="post" class="d-flex align-items-center">
+                                        <input type="hidden" name="cakeName" th:value="${item.cakeName}">
+                                        <input type="number" name="quantity" th:value="${item.quantity}" 
+                                               class="form-control form-control-sm text-center" min="1" 
+                                               onchange="this.form.submit()">
+                                    </form>
+                                </td>
+                                <td th:text="${'LKR ' + #numbers.formatDecimal(item.subTotal, 1, 'COMMA', 2, 'POINT')}" class="text-end fw-bold text-pink"></td>
+                                <td class="text-center">
+                                    <a th:href="@{/bookings/cart/remove/{name}(name=${item.cakeName})}" class="text-danger p-2">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 bg-light border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 mb-0">Order Total:</span>
+                        <span class="h4 fw-bold text-pink mb-0" th:text="${'LKR ' + #numbers.formatDecimal(cartTotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                    </div>
+                </div>
+            </div>
+            <a th:href="@{/bookings/products}" class="btn btn-light border w-100 rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i> Add More Items</a>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="col-lg-5">
+            <div class="glass-card">
+                <h5 class="fw-bold mb-4">Customer Details</h5>
+                <form th:action="@{/bookings/place-order}" th:object="${booking}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" th:field="*{customerName}" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" th:field="*{phone}" class="form-control" placeholder="07XXXXXXXX" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Special Delivery Instructions</label>
+                        <textarea th:field="*{orderDetails}" class="form-control" rows="3" placeholder="Flavors, colors, or messages..."></textarea>
+                    </div>
+                    
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <label class="form-label">Delivery Date</label>
+                            <input type="date" th:field="*{deliveryDate}" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Order Type</label>
+                            <select th:field="*{orderType}" class="form-select">
+                                <option value="Standard">Standard</option>
+                                <option value="Express">Express</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow rounded-pill py-3">
+                        <i class="fa-solid fa-check-double me-2"></i> Place My Order Now
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <p class="small text-muted"><i class="fa-solid fa-lock me-1"></i> Secure Checkout by CakeForge Studio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
