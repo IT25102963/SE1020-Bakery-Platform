@@ -13,7 +13,7 @@ Spring Boot CRUD web application module for a Bakery System to manage only Order
 
 ## Package
 
-`com.cakecraft.orderbookings`
+`lk.sliit.it25.bakeryweb`
 
 ## Features
 

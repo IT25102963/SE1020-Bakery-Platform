@@ -1,4 +1,4 @@
-package com.cakecraft.orderbookings.model;
+package lk.sliit.it25.bakeryweb.model;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

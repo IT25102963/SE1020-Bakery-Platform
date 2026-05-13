@@ -1,12 +1,12 @@
-package com.cakecraft.orderbookings.model;
+package lk.sliit.it25.bakeryweb.model;
 
 import java.math.BigDecimal;
 
 public class CartItem {
+
     private String cakeName;
     private Integer quantity;
     private BigDecimal unitPrice;
-    private BigDecimal subTotal;
 
     public CartItem() {
     }
@@ -15,7 +15,6 @@ public class CartItem {
         this.cakeName = cakeName;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
-        this.subTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public String getCakeName() {
@@ -32,7 +31,6 @@ public class CartItem {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-        updateSubTotal();
     }
 
     public BigDecimal getUnitPrice() {
@@ -41,16 +39,9 @@ public class CartItem {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
-        updateSubTotal();
     }
 
     public BigDecimal getSubTotal() {
-        return subTotal;
-    }
-
-    private void updateSubTotal() {
-        if (unitPrice != null && quantity != null) {
-            this.subTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
-        }
+        return unitPrice.multiply(new BigDecimal(quantity));
     }
 }

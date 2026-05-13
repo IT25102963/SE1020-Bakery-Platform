@@ -1,9 +1,9 @@
-package com.cakecraft.orderbookings.controller;
+package lk.sliit.it25.bakeryweb.controller;
 
-import com.cakecraft.orderbookings.model.Booking;
-import com.cakecraft.orderbookings.model.CartItem;
-import com.cakecraft.orderbookings.service.BookingService;
-import com.cakecraft.orderbookings.service.CartService;
+import lk.sliit.it25.bakeryweb.model.Booking;
+import lk.sliit.it25.bakeryweb.model.CartItem;
+import lk.sliit.it25.bakeryweb.service.BookingService;
+import lk.sliit.it25.bakeryweb.service.CartService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
