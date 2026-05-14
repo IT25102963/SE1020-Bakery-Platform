@@ -52,7 +52,7 @@
             <div class="stat-card">
                 <div class="stat-icon icon-green"><i class="fa-solid fa-check-double"></i></div>
                 <div class="stat-info">
-                    <h3>-</h3>
+                    <h3 th:text="${readyCount}">-</h3>
                     <p>Ready for Delivery</p>
                 </div>
             </div>
@@ -61,7 +61,7 @@
             <div class="stat-card">
                 <div class="stat-icon icon-blue"><i class="fa-solid fa-hourglass-half"></i></div>
                 <div class="stat-info">
-                    <h3>-</h3>
+                    <h3 th:text="${pendingCount}">-</h3>
                     <p>Pending Orders</p>
                 </div>
             </div>

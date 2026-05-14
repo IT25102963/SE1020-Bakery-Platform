@@ -73,6 +73,8 @@ public class BookingController {
     @GetMapping("/my-orders")
     public String listBookings(Model model) {
         model.addAttribute("bookings", bookingService.getAllBookings());
+        model.addAttribute("readyCount", bookingService.getReadyForDeliveryCount());
+        model.addAttribute("pendingCount", bookingService.getPendingCount());
         return "booking-list";
     }
 

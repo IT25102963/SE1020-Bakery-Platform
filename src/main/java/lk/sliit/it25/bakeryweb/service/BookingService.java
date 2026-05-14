@@ -76,4 +76,20 @@ public class BookingService {
         BigDecimal unit = getCakePrices().getOrDefault(cakeName, BigDecimal.ZERO);
         return unit.multiply(new BigDecimal(quantity));
     }
+    public long countByStatus(String status) {
+        return getAllBookings().stream()
+                .filter(b -> status != null && status.equalsIgnoreCase(b.getStatus()))
+                .count();
+    }
+
+    public long getPendingCount() {
+        return countByStatus("Pending");
+    }
+
+    public long getReadyForDeliveryCount() {
+        // 'Confirmed' bookings are considered ready for delivery
+        return countByStatus("Confirmed");
+    }
+
 }
+
