@@ -31,8 +31,17 @@ public class BookingFileRepository {
             List<String> lines = Files.readAllLines(dataFile);
             List<Booking> out = new ArrayList<>();
             for (String l : lines) {
-                if (l.isBlank()) continue;
-                out.add(fromCsv(l));
+                if (l == null || l.isBlank()) continue;
+                try {
+                    Booking b = fromCsv(l);
+                    if (b == null) continue;
+                    // skip malformed or missing-id entries
+                    if (b.getBookingId() == null || b.getBookingId().isBlank()) continue;
+                    out.add(b);
+                } catch (Exception ex) {
+                    // skip invalid lines instead of failing the entire read
+                    continue;
+                }
             }
             return out;
         } catch (IOException e) {
@@ -95,33 +104,55 @@ public class BookingFileRepository {
 
     private String toCsv(Booking b) {
         return String.join(",",
-                b.getBookingId(),
-                b.getCustomerName(),
-                b.getPhone(),
-                b.getCakeName(),
-                b.getOrderDetails(),
-                b.getOrderType(),
-                String.valueOf(b.getQuantity()),
+                safe(b.getBookingId()),
+                safe(b.getCustomerName()),
+                safe(b.getPhone()),
+                safe(b.getCakeName()),
+                safe(b.getOrderDetails()),
+                safe(b.getOrderType()),
+                String.valueOf(b.getQuantity() == null ? 0 : b.getQuantity()),
                 b.getBookingDate() == null ? "" : b.getBookingDate().toString(),
                 b.getDeliveryDate() == null ? "" : b.getDeliveryDate().toString(),
                 b.getTotalPrice() == null ? "0" : b.getTotalPrice().toString(),
-                b.getStatus() == null ? "" : b.getStatus());
+                safe(b.getStatus()));
+    }
+
+    private String safe(String s) {
+        if (s == null) return "";
+        String t = s.trim();
+        return "null".equalsIgnoreCase(t) ? "" : t;
     }
 
     private Booking fromCsv(String line) {
-        String[] parts = line.split(",");
+        String[] parts = line.split(",", -1);
         Booking b = new Booking();
-        b.setBookingId(parts.length > 0 ? parts[0] : "");
-        b.setCustomerName(parts.length > 1 ? parts[1] : "");
-        b.setPhone(parts.length > 2 ? parts[2] : "");
-        b.setCakeName(parts.length > 3 ? parts[3] : "");
-        b.setOrderDetails(parts.length > 4 ? parts[4] : "");
-        b.setOrderType(parts.length > 5 ? parts[5] : "");
-        b.setQuantity(parts.length > 6 && !parts[6].isBlank() ? Integer.parseInt(parts[6]) : 0);
-        b.setBookingDate(parts.length > 7 && !parts[7].isBlank() ? LocalDate.parse(parts[7]) : null);
-        b.setDeliveryDate(parts.length > 8 && !parts[8].isBlank() ? LocalDate.parse(parts[8]) : null);
-        b.setTotalPrice(parts.length > 9 && !parts[9].isBlank() ? new BigDecimal(parts[9]) : BigDecimal.ZERO);
-        b.setStatus(parts.length > 10 ? parts[10] : "");
+        b.setBookingId(parts.length > 0 ? parts[0].trim() : "");
+        b.setCustomerName(parts.length > 1 ? parts[1].trim() : "");
+        b.setPhone(parts.length > 2 ? parts[2].trim() : "");
+        b.setCakeName(parts.length > 3 ? parts[3].trim() : "");
+        b.setOrderDetails(parts.length > 4 ? parts[4].trim() : "");
+        b.setOrderType(parts.length > 5 ? parts[5].trim() : "");
+        try {
+            b.setQuantity(parts.length > 6 && !parts[6].isBlank() ? Integer.parseInt(parts[6].trim()) : 0);
+        } catch (NumberFormatException nfe) {
+            b.setQuantity(0);
+        }
+        try {
+            b.setBookingDate(parts.length > 7 && !parts[7].isBlank() ? LocalDate.parse(parts[7].trim()) : null);
+        } catch (Exception e) {
+            b.setBookingDate(null);
+        }
+        try {
+            b.setDeliveryDate(parts.length > 8 && !parts[8].isBlank() ? LocalDate.parse(parts[8].trim()) : null);
+        } catch (Exception e) {
+            b.setDeliveryDate(null);
+        }
+        try {
+            b.setTotalPrice(parts.length > 9 && !parts[9].isBlank() ? new BigDecimal(parts[9].trim()) : BigDecimal.ZERO);
+        } catch (Exception e) {
+            b.setTotalPrice(BigDecimal.ZERO);
+        }
+        b.setStatus(parts.length > 10 ? parts[10].trim() : "");
         return b;
     }
 }

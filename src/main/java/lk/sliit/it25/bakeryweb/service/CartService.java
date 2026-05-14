@@ -14,12 +14,23 @@ public class CartService {
     private static final String CART_SESSION_KEY = "cart";
 
     public List<CartItem> getCart(HttpSession session) {
-        List<CartItem> cart = (List<CartItem>) session.getAttribute(CART_SESSION_KEY);
-        if (cart == null) {
-            cart = new ArrayList<>();
+        Object raw = session.getAttribute(CART_SESSION_KEY);
+        if (raw instanceof List<?>) {
+            List<?> rawList = (List<?>) raw;
+            List<CartItem> cart = new ArrayList<>();
+            for (Object o : rawList) {
+                if (o instanceof CartItem) {
+                    cart.add((CartItem) o);
+                }
+            }
+            // ensure the session holds a typed list
             session.setAttribute(CART_SESSION_KEY, cart);
+            return cart;
+        } else {
+            List<CartItem> cart = new ArrayList<>();
+            session.setAttribute(CART_SESSION_KEY, cart);
+            return cart;
         }
-        return cart;
     }
 
     public void addToCart(HttpSession session, CartItem item) {

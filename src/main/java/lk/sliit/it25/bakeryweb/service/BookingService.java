@@ -20,7 +20,8 @@ public class BookingService {
     }
 
     public Booking createBooking(Booking booking) {
-        booking.setBookingId(idGenerator.generateId());
+        // Generate an ID that doesn't collide with existing bookings
+        booking.setBookingId(idGenerator.generateFromExisting(repository.findAll()));
         repository.save(booking);
         return booking;
     }
@@ -59,6 +60,12 @@ public class BookingService {
 
     public Map<String, BigDecimal> getCakePrices() {
         Map<String, BigDecimal> prices = new LinkedHashMap<>();
+        // Prices must match the product names used in the templates
+        prices.put("Creamy Strawberry Cake", new BigDecimal("2200.00"));
+        prices.put("Classic Tiramisu Slice", new BigDecimal("1800.00"));
+        prices.put("Fruit Fiesta Tart", new BigDecimal("2500.00"));
+        prices.put("Raspberry Choco Tart", new BigDecimal("2700.00"));
+        // Keep legacy product names (if referenced elsewhere)
         prices.put("Chocolate Truffle", new BigDecimal("4500.00"));
         prices.put("Vanilla Dream", new BigDecimal("4000.00"));
         prices.put("Red Velvet", new BigDecimal("4800.00"));

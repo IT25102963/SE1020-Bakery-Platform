@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+ 
+# Ignore exported cookie files
+cookies.txt
+newcookies.txt

@@ -106,7 +106,7 @@
                             <small class="text-muted" th:text="${'Qty: ' + booking.quantity}"></small>
                         </td>
                         <td>
-                            <div th:text="${#temporals.format(booking.deliveryDate, 'MMM dd, yyyy')}"></div>
+                            <div th:text="${booking.deliveryDate != null ? #temporals.format(booking.deliveryDate, 'MMM dd, yyyy') : '-'}"></div>
                         </td>
                         <td class="fw-bold" th:text="${'LKR ' + #numbers.formatDecimal(booking.totalPrice, 1, 'COMMA', 2, 'POINT')}"></td>
                         <td>

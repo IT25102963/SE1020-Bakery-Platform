@@ -118,6 +118,10 @@ public class BookingController {
                 newBooking.setPhone(booking.getPhone());
                 newBooking.setOrderDetails(booking.getOrderDetails());
                 newBooking.setOrderType(booking.getOrderType());
+                // inherit booking/delivery dates and status from the checkout form (use defaults when missing)
+                newBooking.setBookingDate(booking.getBookingDate() != null ? booking.getBookingDate() : LocalDate.now());
+                newBooking.setDeliveryDate(booking.getDeliveryDate() != null ? booking.getDeliveryDate() : LocalDate.now().plusDays(1));
+                newBooking.setStatus(booking.getStatus() == null || booking.getStatus().isBlank() ? "Pending" : booking.getStatus());
 
                 newBooking.setCakeName(item.getCakeName());
                 newBooking.setQuantity(item.getQuantity());
@@ -129,7 +133,17 @@ public class BookingController {
             redirectAttributes.addFlashAttribute("successMessage",
                     "All bookings from your cart have been placed successfully!");
         } else {
-            // Fallback for single item booking
+            // Fallback for single item booking - validate cake selection
+            if (booking.getCakeName() == null || booking.getCakeName().isBlank()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "No items to place order. Please select a product or add items to your cart.");
+                return "redirect:/bookings/products";
+            }
+            // Ensure dates and total price are populated
+            if (booking.getBookingDate() == null) booking.setBookingDate(LocalDate.now());
+            if (booking.getDeliveryDate() == null) booking.setDeliveryDate(LocalDate.now().plusDays(1));
+            if (booking.getTotalPrice() == null || booking.getTotalPrice().compareTo(BigDecimal.ZERO) == 0) {
+                booking.setTotalPrice(bookingService.calculateTotalPrice(booking.getCakeName(), booking.getQuantity() == null ? 1 : booking.getQuantity()));
+            }
             Booking saved = bookingService.createBooking(booking);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Booking created successfully with ID " + saved.getBookingId());
