@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Standard Cake Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+          --cream:   #FDF6EC;
+          --brown:   #5C3D2E;
+          --gold:    #C9A96E;
+          --rose:    #E8A598;
+          --dark:    #2C1A0E;
+          --white:   #FFFFFF;
+          --shadow:  0 4px 24px rgba(92,61,46,0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          font-family: 'Lato', sans-serif;
+          background: var(--cream);
+          color: var(--dark);
+          min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+          background: var(--brown);
+          color: var(--cream);
+          padding: 28px 40px;
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        }
+        header .logo { font-size: 2.2rem; }
+        header h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 2rem;
+          letter-spacing: 1px;
+        }
+        header p { font-size: 0.95rem; opacity: 0.75; margin-top: 2px; }
+
+        /* ── MAIN LAYOUT ── */
+        .container {
+          max-width: 1100px;
+          margin: 40px auto;
+          padding: 0 24px;
+          display: grid;
+          grid-template-columns: 340px 1fr;
+          gap: 32px;
+          align-items: start;
+        }
+
+        /* ── CARD ── */
+        .card {
+          background: var(--white);
+          border-radius: 16px;
+          padding: 28px;
+          box-shadow: var(--shadow);
+        }
+        .card h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.35rem;
+          color: var(--brown);
+          margin-bottom: 20px;
+          padding-bottom: 12px;
+          border-bottom: 2px solid var(--gold);
+        }
+
+        /* ── FORM ── */
+        .form-group { margin-bottom: 16px; }
+        label {
+          display: block;
+          font-size: 0.82rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          color: var(--brown);
+          margin-bottom: 6px;
+        }
+        input, select, textarea {
+          width: 100%;
+          padding: 10px 14px;
+          border: 1.5px solid #DDD;
+          border-radius: 8px;
+          font-family: 'Lato', sans-serif;
+          font-size: 0.95rem;
+          background: var(--cream);
+          color: var(--dark);
+          transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+          outline: none;
+          border-color: var(--gold);
+        }
+        textarea { resize: vertical; min-height: 70px; }
+
+        .btn {
+          width: 100%;
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          font-family: 'Lato', sans-serif;
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+          letter-spacing: 0.5px;
+        }
+        .btn-primary {
+          background: var(--brown);
+          color: var(--white);
+        }
+        .btn-primary:hover { background: var(--dark); transform: translateY(-1px); }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+        .stat {
+          background: var(--white);
+          border-radius: 12px;
+          padding: 14px 20px;
+          flex: 1;
+          text-align: center;
+          box-shadow: var(--shadow);
+        }
+        .stat-num {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.8rem;
+          color: var(--brown);
+          font-weight: 700;
+        }
+        .stat-label {
+          font-size: 0.78rem;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 0.7px;
+        }
+
+        /* ── CATALOG TABLE ── */
+        .catalog-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+        .catalog-header h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.35rem;
+          color: var(--brown);
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        thead tr {
+          background: var(--brown);
+          color: var(--cream);
+        }
+        th {
+          padding: 12px 16px;
+          text-align: left;
+          font-size: 0.82rem;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          font-weight: 700;
+        }
+        th:first-child { border-radius: 8px 0 0 0; }
+        th:last-child  { border-radius: 0 8px 0 0; }
+
+        tbody tr {
+          border-bottom: 1px solid #EEE;
+          transition: background 0.15s;
+        }
+        tbody tr:hover { background: #FDF0E6; }
+        td { padding: 13px 16px; font-size: 0.93rem; }
+
+        .badge {
+          background: #FDF0E6;
+          color: var(--brown);
+          border: 1px solid var(--gold);
+          border-radius: 20px;
+          padding: 3px 10px;
+          font-size: 0.78rem;
+          font-weight: 700;
+        }
+        .price { font-weight: 700; color: var(--brown); }
+
+        .btn-delete {
+          background: transparent;
+          border: 1.5px solid var(--rose);
+          color: #c0392b;
+          border-radius: 6px;
+          padding: 5px 12px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-delete:hover { background: var(--rose); color: white; }
+
+        .empty-state {
+          text-align: center;
+          padding: 50px 20px;
+          color: #AAA;
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 1rem; }
+
+        /* ── TOAST ── */
+        .toast {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          background: var(--brown);
+          color: var(--white);
+          padding: 14px 22px;
+          border-radius: 10px;
+          font-size: 0.93rem;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+          opacity: 0;
+          transform: translateY(10px);
+          transition: all 0.3s;
+          z-index: 999;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #c0392b; }
+
+        @media (max-width: 768px) {
+          .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <span class="logo">🎂</span>
+    <div>
+        <h1>Standard Cake Catalog</h1>
+        <p>Manage your pre-made cake collection</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- LEFT: Add Cake Form -->
+    <div class="card">
+        <h2>➕ Add New Cake</h2>
+
+        <div class="form-group">
+            <label>Cake Name *</label>
+            <input type="text" id="cakeName" placeholder="e.g. Chocolate Truffle"/>
+        </div>
+
+        <div class="form-group">
+            <label>Category</label>
+            <select id="cakeCategory">
+                <option value="Birthday">Birthday</option>
+                <option value="Wedding">Wedding</option>
+                <option value="Anniversary">Anniversary</option>
+                <option value="Celebration">Celebration</option>
+                <option value="Seasonal">Seasonal</option>
+                <option value="Custom">Custom</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Price (LKR) *</label>
+            <input type="number" id="cakePrice" placeholder="e.g. 2500" min="0"/>
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="cakeDesc" placeholder="Describe the cake..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" onclick="addCake()">🎂 Add to Catalog</button>
+    </div>
+
+    <!-- RIGHT: Catalog -->
+    <div>
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-num" id="totalCount">0</div>
+                <div class="stat-label">Total Cakes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" id="avgPrice">0</div>
+                <div class="stat-label">Avg Price (LKR)</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:20px 24px 0;">
+                <div class="catalog-header">
+                    <h2>📋 Cake Catalog</h2>
+                </div>
+            </div>
+
+            <div id="catalogContainer">
+                <div class="empty-state">
+                    <div class="icon">🎂</div>
+                    <p>No cakes yet. Add your first cake!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const API = '/api/cakes';
+
+    // ── Load all cakes on page load
+    window.onload = loadCakes;
+
+    async function loadCakes() {
+      try {
+        const res = await fetch(API);
+        const cakes = await res.json();
+        renderCatalog(cakes);
+        updateStats(cakes);
+      } catch (e) {
+        showToast('Failed to load cakes', true);
+      }
+    }
+
+    // ── Add Cake
+    async function addCake() {
+      const name     = document.getElementById('cakeName').value.trim();
+      const category = document.getElementById('cakeCategory').value;
+      const price    = document.getElementById('cakePrice').value;
+      const desc     = document.getElementById('cakeDesc').value.trim();
+
+      if (!name) { showToast('Please enter a cake name', true); return; }
+      if (!price || isNaN(price)) { showToast('Please enter a valid price', true); return; }
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, category, price, description: desc })
+        });
+        if (res.ok) {
+          showToast('✅ Cake added successfully!');
+          clearForm();
+          loadCakes();
+        } else {
+          const msg = await res.text();
+          showToast(msg || 'Error adding cake', true);
+        }
+      } catch (e) {
+        showToast('Connection error', true);
+      }
+    }
+
+    // ── Delete Cake
+    async function deleteCake(id) {
+      if (!confirm('Delete this cake from the catalog?')) return;
+      try {
+        const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('🗑️ Cake deleted');
+          loadCakes();
+        } else {
+          showToast('Error deleting cake', true);
+        }
+      } catch (e) {
+        showToast('Connection error', true);
+      }
+    }
+
+    // ── Render Table
+    function renderCatalog(cakes) {
+      const container = document.getElementById('catalogContainer');
+      if (!cakes.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🎂</div>
+            <p>No cakes yet. Add your first cake!</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price (LKR)</th>
+              <th>Description</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cakes.map(c => `
+              <tr>
+                <td><code style="font-size:0.78rem;color:#888">${c.id}</code></td>
+                <td><strong>${c.name}</strong></td>
+                <td><span class="badge">${c.category}</span></td>
+                <td class="price">${Number(c.price).toLocaleString()}</td>
+                <td style="color:#666;font-size:0.88rem">${c.description || '—'}</td>
+                <td>
+                  <button class="btn-delete" onclick="deleteCake('${c.id}')">🗑 Delete</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── Update Stats
+    function updateStats(cakes) {
+      document.getElementById('totalCount').textContent = cakes.length;
+      const avg = cakes.length
+        ? Math.round(cakes.reduce((s, c) => s + c.price, 0) / cakes.length)
+        : 0;
+      document.getElementById('avgPrice').textContent = avg.toLocaleString();
+    }
+
+    // ── Clear Form
+    function clearForm() {
+      document.getElementById('cakeName').value  = '';
+      document.getElementById('cakePrice').value = '';
+      document.getElementById('cakeDesc').value  = '';
+      document.getElementById('cakeCategory').selectedIndex = 0;
+    }
+
+    // ── Toast
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(() => { t.className = 'toast'; }, 3000);
+    }
+</script>
+
+</body>
+</html>
