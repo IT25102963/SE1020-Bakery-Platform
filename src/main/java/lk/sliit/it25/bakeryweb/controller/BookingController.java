@@ -73,24 +73,6 @@ public class BookingController {
         return "booking-list";
     }
 
-    @GetMapping("/new")
-    public String showCreateForm(
-            @RequestParam(value = "cakeName", required = false) String cakeName,
-            Model model) {
-        Booking booking = new Booking();
-        booking.setBookingDate(LocalDate.now());
-        booking.setDeliveryDate(LocalDate.now().plusDays(1));
-        booking.setStatus("Pending");
-        booking.setTotalPrice(BigDecimal.ZERO);
-        booking.setQuantity(1);
-        if (cakeName != null && !cakeName.isBlank()) {
-            booking.setCakeName(cakeName.trim());
-            booking.setTotalPrice(bookingService.calculateTotalPrice(booking.getCakeName(), booking.getQuantity()));
-        }
-        model.addAttribute("booking", booking);
-        return "booking-form";
-    }
-
     @PostMapping("/place-order")
     public String saveBooking(
             @Valid @ModelAttribute("booking") Booking booking,
