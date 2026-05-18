@@ -2,98 +2,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Customer Registration | Bakery Platform</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .register-card {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        .register-card h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-weight: bold;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box; /* Ensures padding doesn't break width */
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #d2691e; /* Chocolate/Bakery color */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .submit-btn:hover {
-            background-color: #a0522d;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Register | CakeForge Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-
-<div class="register-card">
-    <h2>Create an Account</h2>
-
-    <form action="/registerCustomer" method="POST">
-
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" name="customerName" required placeholder="e.g. Anura Rohana">
+<nav class="navbar navbar-expand-lg cake-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/catalog">
+            <img src="/theme/img/logo.png" alt="CakeForge" class="brand-logo">
+            <span>CakeForge</span>
+        </a>
+        <div class="ms-auto d-flex gap-2">
+            <a href="/login" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Login</a>
+            <a href="/admin/register" class="btn btn-outline-secondary btn-sm rounded-pill px-4 auth-nav-btn">Admin Register</a>
         </div>
+    </div>
+</nav>
 
-        <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" name="customerEmail" required placeholder="anura@example.com">
+<header class="page-header container">
+    <h1>Create Account</h1>
+    <p>Join CakeForge to manage your orders and profile.</p>
+</header>
+
+<main class="container py-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-9">
+            <div class="glass-card">
+                <form action="/registerCustomer" method="post">
+                    <div class="mb-3">
+                        <label for="customerName" class="form-label fw-semibold">Full Name</label>
+                        <input type="text" class="form-control" id="customerName" name="customerName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerEmail" class="form-label fw-semibold">Email Address</label>
+                        <input type="email" class="form-control" id="customerEmail" name="customerEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPhone" class="form-label fw-semibold">Phone Number</label>
+                        <input type="text" class="form-control" id="customerPhone" name="customerPhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerAddress" class="form-label fw-semibold">Address</label>
+                        <input type="text" class="form-control" id="customerAddress" name="customerAddress" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPhotoUrl" class="form-label fw-semibold">Profile Photo URL (Optional)</label>
+                        <input type="url" class="form-control" id="customerPhotoUrl" name="customerPhotoUrl" placeholder="https://example.com/photo.jpg">
+                    </div>
+                    <div class="mb-4">
+                        <label for="customerPassword" class="form-label fw-semibold">Password</label>
+                        <input type="password" class="form-control" id="customerPassword" name="customerPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa-solid fa-user-plus me-2"></i> Register
+                    </button>
+                </form>
+
+                <p class="small text-muted text-center mt-4 mb-0">
+                    Already have an account? <a href="/login">Login now</a>
+                </p>
+            </div>
         </div>
+    </div>
+</main>
 
-        <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" name="customerPhone" required placeholder="077xxxxxxx">
-        </div>
-
-        <div class="form-group">
-            <label>Delivery Address</label>
-            <textarea name="customerAddress" rows="3" required placeholder="Enter full address"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="customerPassword" required>
-        </div>
-
-        <button type="submit" class="submit-btn">Register</button>
-    </form>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
