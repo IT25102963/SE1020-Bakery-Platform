@@ -1,8 +1,6 @@
 package lk.sliit.it25.bakeryweb.model;
 
-public class DeliverySlot {
-    private String id;
-    private String customerName;
+public class DeliverySlot extends BaseDeliveryRecord {
     private String address;
     private String deliveryDate;
     private String deliveryTime;
@@ -11,27 +9,10 @@ public class DeliverySlot {
     }
 
     public DeliverySlot(String id, String customerName, String address, String deliveryDate, String deliveryTime) {
-        this.id = id;
-        this.customerName = customerName;
+        super(id, customerName);
         this.address = address;
         this.deliveryDate = deliveryDate;
         this.deliveryTime = deliveryTime;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
     }
 
     public String getAddress() {

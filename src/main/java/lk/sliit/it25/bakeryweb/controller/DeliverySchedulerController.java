@@ -24,19 +24,71 @@ public class DeliverySchedulerController {
         return "delivery/scheduler";
     }
 
+    @GetMapping("/details")
+    public String showDetails(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes) {
+        return deliveryScheduleService.getSlotById(slotId)
+                .map(slot -> {
+                    model.addAttribute("slot", slot);
+                    return "delivery/slotDetails";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("message", "Slot not found.");
+                    return "redirect:/delivery";
+                });
+    }
+
+    @GetMapping("/edit")
+    public String showEditPage(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes) {
+        return deliveryScheduleService.getSlotById(slotId)
+                .map(slot -> {
+                    model.addAttribute("slot", slot);
+                    return "delivery/updateSlot";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("message", "Slot not found.");
+                    return "redirect:/delivery";
+                });
+    }
+
     @PostMapping("/schedule")
-    public String scheduleTime(@RequestParam String customerName,
+    public String scheduleTime(@RequestParam String bookingId,
+                               @RequestParam String customerName,
                                @RequestParam String address,
                                @RequestParam String deliveryDate,
                                @RequestParam String deliveryTime,
                                RedirectAttributes redirectAttributes) {
-        if (customerName.isBlank() || address.isBlank() || deliveryDate.isBlank() || deliveryTime.isBlank()) {
+        if (bookingId.isBlank() || customerName.isBlank() || address.isBlank() || deliveryDate.isBlank() || deliveryTime.isBlank()) {
             redirectAttributes.addFlashAttribute("message", "All fields are required.");
             return "redirect:/delivery";
         }
 
-        deliveryScheduleService.scheduleTime(customerName, address, deliveryDate, deliveryTime);
-        redirectAttributes.addFlashAttribute("message", "Delivery slot scheduled.");
+        String normalizedBookingId = bookingId.trim().toUpperCase();
+        if (!normalizedBookingId.matches("^B\\d{3,}$")) {
+            redirectAttributes.addFlashAttribute("message", "Booking ID must match order format (e.g. B001).");
+            return "redirect:/delivery";
+        }
+
+        boolean created = deliveryScheduleService.scheduleTime(bookingId, customerName, address, deliveryDate, deliveryTime);
+        redirectAttributes.addFlashAttribute("message", created
+                ? "Delivery slot scheduled."
+                : "Booking ID already exists in delivery schedule.");
+        return "redirect:/delivery";
+    }
+
+    @PostMapping("/update")
+    public String updateSlot(@RequestParam String slotId,
+                             @RequestParam String customerName,
+                             @RequestParam String address,
+                             @RequestParam String deliveryDate,
+                             @RequestParam String deliveryTime,
+                             RedirectAttributes redirectAttributes) {
+        if (slotId.isBlank() || customerName.isBlank() || address.isBlank() || deliveryDate.isBlank() || deliveryTime.isBlank()) {
+            redirectAttributes.addFlashAttribute("message", "All fields are required.");
+            return "redirect:/delivery";
+        }
+
+        boolean updated = deliveryScheduleService.updateSlot(slotId, customerName, address, deliveryDate, deliveryTime);
+        redirectAttributes.addFlashAttribute("message", updated ? "Delivery slot updated." : "Slot not found.");
         return "redirect:/delivery";
     }
 

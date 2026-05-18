@@ -1,0 +1,161 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap");
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%);
+    --secondary-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    --bg-light: #fdfbfb;
+    --text-dark: #2d3436;
+    --text-muted: #636e72;
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+}
+
+body {
+    font-family: 'Outfit', 'Montserrat', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin: 0;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(255, 154, 139, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 106, 136, 0.05) 0px, transparent 50%);
+}
+
+.cake-navbar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem !important;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(255, 106, 136, 0.1);
+    color: #ff6a88 !important;
+}
+
+.page-header {
+    padding: 4rem 0 2rem;
+    text-align: left;
+}
+
+.page-header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1.5px;
+}
+
+.page-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.8rem 1.5rem;
+    font-weight: 700;
+}
+
+.btn-warning {
+    background: var(--secondary-gradient);
+    border: none;
+    color: white;
+    border-radius: var(--radius-md);
+    padding: 0.8rem 1.5rem;
+    font-weight: 700;
+}
+
+.table {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: white;
+    border: none;
+}
+
+.table thead {
+    background: #f8f9fa;
+}
+
+.table thead th {
+    border: none;
+    padding: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.table tbody td {
+    padding: 1.2rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1f1f1;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    margin: 0 2px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-action i {
+    color: inherit !important;
+}
+
+.btn-receipt { background-color: #eee6ff; color: #7c4dff !important; }
+.btn-status { background-color: #fff1df; color: #ff9800 !important; }
+.btn-edit { background-color: #e3f2fd; color: #42a5f5 !important; }
+.btn-delete { background-color: #fdecef; color: #ef5350 !important; }
+
+.btn-receipt:hover { background-color: #7c4dff; color: #fff !important; }
+.btn-status:hover { background-color: #ff9800; color: #fff !important; }
+.btn-edit:hover { background-color: #42a5f5; color: #fff !important; }
+.btn-delete:hover { background-color: #ef5350; color: #fff !important; }
