@@ -139,7 +139,6 @@
                             <td class="text-center slot-form-actions">
                                 <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=<%= slot.getId() %>"><i class="fa-solid fa-receipt"></i></a>
                                 <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= slot.getId() %>"><i class="fa-solid fa-clock"></i></a>
-                                <a class="btn-action btn-edit" title="Edit" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= slot.getId() %>"><i class="fa-solid fa-pen"></i></a>
                                 <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
                                     <input type="hidden" name="slotId" value="<%= slot.getId() %>" />
                                     <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
