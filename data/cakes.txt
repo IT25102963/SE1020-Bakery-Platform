@@ -1,0 +1,4 @@
+1,Creamy Strawberry,2200.00,Signature Cakes,Fresh cream cake with strawberry glaze and sponge layers
+2,Classic Tiramisu,1800.00,Italian Desserts,Coffee infused tiramisu with mascarpone and cocoa dust
+3,Fruit Fiesta Tart,2500.00,Fruit Collection,Buttery tart base topped with seasonal fruits and custard
+4,Raspberry Choco,2700.00,Chocolate Collection,Dark chocolate tart with raspberry compote and ganache
