@@ -41,10 +41,16 @@
 
     <form method="post" action="${pageContext.request.contextPath}/delivery/update">
         <input type="hidden" name="slotId" value="<%= slot.getId() %>" />
-        <input type="hidden" name="customerName" value="<%= slot.getCustomerName() %>" />
-        <input type="hidden" name="address" value="<%= slot.getAddress() %>" />
 
         <div class="row g-2">
+            <div class="col-md-6">
+                <label class="form-label">Customer Name</label>
+                <input class="form-control" type="text" name="customerName" value="<%= slot.getCustomerName() %>" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Address</label>
+                <input class="form-control" type="text" name="address" value="<%= slot.getAddress() %>" required />
+            </div>
             <div class="col-md-6">
                 <label class="form-label">Delivery Date</label>
                 <input class="form-control" type="date" name="deliveryDate" value="<%= slot.getDeliveryDate() %>" required />

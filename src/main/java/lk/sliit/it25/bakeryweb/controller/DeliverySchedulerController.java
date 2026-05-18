@@ -63,8 +63,8 @@ public class DeliverySchedulerController {
         }
 
         String normalizedBookingId = bookingId.trim().toUpperCase();
-        if (!normalizedBookingId.matches("^B\\d{3,}$")) {
-            redirectAttributes.addFlashAttribute("message", "Booking ID must match order format (e.g. B001).");
+        if (!normalizedBookingId.matches("^[BC]\\d{3,}$")) {
+            redirectAttributes.addFlashAttribute("message", "Schedule ID must be like B001 (booking) or C001 (custom cake).");
             return "redirect:/delivery";
         }
 
