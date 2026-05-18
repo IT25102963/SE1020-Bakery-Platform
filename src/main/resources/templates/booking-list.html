@@ -28,7 +28,7 @@
     <div class="d-flex justify-content-between align-items-end">
         <div>
             <h1>Dashboard</h1>
-            <p>Manage all customer orders and production statuses.</p>
+            <p>Manage customer orders and delivery readiness.</p>
         </div>
         <div class="mb-2">
             <a th:href="@{/bookings/products}" class="btn btn-warning rounded-pill"><i class="fa-solid fa-plus me-2"></i> New Catalog Order</a>
@@ -112,14 +112,13 @@
                         <td>
                             <span th:class="${'badge-status ' + 
                                 (booking.status == 'Pending' ? 'status-pending' : 
-                                 booking.status == 'Confirmed' ? 'status-confirmed' : 
+                                 booking.status == 'Confirmed' || booking.status == 'Ready for Delivery' || booking.status == 'Ready' ? 'status-confirmed' :
                                  booking.status == 'Delivered' ? 'status-delivered' : 'status-cancelled')}"
                                   th:text="${booking.status}"></span>
                         </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center">
                                 <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt"><i class="fa-solid fa-receipt"></i></a>
-                                <a th:href="@{/bookings/status/{id}(id=${booking.bookingId})}" class="btn-action btn-status" title="Update Status"><i class="fa-solid fa-gear"></i></a>
                                 <a th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}" class="btn-action btn-edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <a th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                             </div>

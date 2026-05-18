@@ -38,20 +38,12 @@ public class BookingService {
         return repository.update(id, updated);
     }
 
-    public boolean updateStatus(String id, String status) {
-        return repository.updateStatus(id, status);
-    }
-
     public boolean deleteBooking(String id) {
         return repository.delete(id);
     }
 
     public boolean cancelBooking(String id) {
         return repository.cancel(id);
-    }
-
-    public List<String> getStatuses() {
-        return Arrays.asList("Pending", "Confirmed", "Cancelled");
     }
 
     public List<String> getOrderTypes() {
@@ -87,8 +79,20 @@ public class BookingService {
     }
 
     public long getReadyForDeliveryCount() {
-        // 'Confirmed' bookings are considered ready for delivery
-        return countByStatus("Confirmed");
+        return getAllBookings().stream()
+                .filter(this::isReadyForDelivery)
+                .count();
+    }
+
+    private boolean isReadyForDelivery(Booking booking) {
+        if (booking == null || booking.getStatus() == null) {
+            return false;
+        }
+
+        String normalizedStatus = booking.getStatus().trim().toLowerCase(Locale.ROOT);
+        return "ready for delivery".equals(normalizedStatus)
+                || "ready".equals(normalizedStatus)
+                || "confirmed".equals(normalizedStatus);
     }
 
 }

@@ -45,11 +45,6 @@ public class BookingController {
         return cartService.getCartTotal(session);
     }
 
-    @ModelAttribute("statusOptions")
-    public java.util.List<String> statusOptions() {
-        return bookingService.getStatuses();
-    }
-
     @ModelAttribute("orderTypeOptions")
     public java.util.List<String> orderTypeOptions() {
         return bookingService.getOrderTypes();
@@ -253,33 +248,6 @@ public class BookingController {
             redirectAttributes.addFlashAttribute("successMessage", "Booking updated successfully");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
-        }
-        return "redirect:/bookings/my-orders";
-    }
-
-    @GetMapping("/status/{id}")
-    public String showStatusForm(@PathVariable("id") String bookingId, Model model,
-            RedirectAttributes redirectAttributes) {
-        Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
-        if (bookingOptional.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
-            return "redirect:/bookings/my-orders";
-        }
-
-        model.addAttribute("booking", bookingOptional.get());
-        return "booking-status";
-    }
-
-    @PostMapping("/status/{id}")
-    public String updateStatus(
-            @PathVariable("id") String bookingId,
-            @RequestParam("status") String status,
-            RedirectAttributes redirectAttributes) {
-        boolean updated = bookingService.updateStatus(bookingId, status);
-        if (updated) {
-            redirectAttributes.addFlashAttribute("successMessage", "Booking status updated successfully");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update booking status");
         }
         return "redirect:/bookings/my-orders";
     }
