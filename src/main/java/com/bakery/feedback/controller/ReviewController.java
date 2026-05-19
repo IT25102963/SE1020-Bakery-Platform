@@ -1,10 +1,14 @@
 package com.bakery.feedback.controller;
 
 import com.bakery.feedback.service.ReviewService;
+import jakarta.servlet.http.HttpSession;
+import lk.sliit.it25.bakeryweb.model.Customer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 /**
  * ── OOP CONCEPT: SEPARATION OF CONCERNS ─────────────────────────────────────
@@ -56,7 +60,15 @@ public class  ReviewController {
     //  UI 1 ── New Review (GET — show submission form)
     // ════════════════════════════════════════════════════════════════════════
     @GetMapping("/new")
-    public String showNewReviewForm() {
+    public String showNewReviewForm(HttpSession session, Model model) {
+        if (session.getAttribute("admin") != null) {
+            return "redirect:/bookings/my-orders";
+        }
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("currentUserName", user.getName());
         return "submit-review";
     }
 
@@ -64,9 +76,18 @@ public class  ReviewController {
     //  UI 1 ── Manage Reviews (GET — list + edit/delete)
     // ════════════════════════════════════════════════════════════════════════
     @GetMapping("/manage")
-    public String showManageReviews(Model model) {
+    public String showManageReviews(Model model, HttpSession session) {
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
         try {
-            model.addAttribute("reviews", reviewService.getAllReviews());
+            List<com.bakery.feedback.model.Review> mine = reviewService.getAllReviews().stream()
+                    .filter(r -> r != null
+                            && r.getCustomerName() != null
+                            && r.getCustomerName().trim().equalsIgnoreCase(user.getName() == null ? "" : user.getName().trim()))
+                    .toList();
+            model.addAttribute("reviews", mine);
         } catch (Exception e) {
             model.addAttribute("errorMsg", "Could not load reviews: " + e.getMessage());
         }
@@ -79,11 +100,20 @@ public class  ReviewController {
     @GetMapping("/edit/{id}")
     public String showCustomerEditForm(@PathVariable("id") String reviewId,
                                        Model model,
+                                       HttpSession session,
                                        RedirectAttributes redirectAttributes) {
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
         try {
             var review = reviewService.getReviewById(reviewId);
             if (review == null) {
                 redirectAttributes.addFlashAttribute("errorMsg", "⚠️ Review not found: " + reviewId);
+                return "redirect:/reviews/manage";
+            }
+            if (!isOwner(review.getCustomerName(), user)) {
+                redirectAttributes.addFlashAttribute("errorMsg", "⚠️ You can edit only your own reviews.");
                 return "redirect:/reviews/manage";
             }
             model.addAttribute("review", review);
@@ -103,17 +133,26 @@ public class  ReviewController {
                                    @RequestParam("cakeName") String cakeName,
                                    @RequestParam("rating") int rating,
                                    @RequestParam("comment") String comment,
+                                   HttpSession session,
                                    RedirectAttributes redirectAttributes) {
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
         try {
             var existing = reviewService.getReviewById(reviewId);
             if (existing == null) {
                 redirectAttributes.addFlashAttribute("errorMsg", "⚠️ Review not found: " + reviewId);
                 return "redirect:/reviews/manage";
             }
+            if (!isOwner(existing.getCustomerName(), user)) {
+                redirectAttributes.addFlashAttribute("errorMsg", "⚠️ You can edit only your own reviews.");
+                return "redirect:/reviews/manage";
+            }
 
             boolean success = reviewService.updateReview(
                     reviewId,
-                    customerName,
+                    user.getName(),
                     cakeName,
                     rating,
                     comment,
@@ -137,8 +176,22 @@ public class  ReviewController {
     // ════════════════════════════════════════════════════════════════════════
     @PostMapping("/delete/{id}")
     public String deleteCustomerReview(@PathVariable("id") String reviewId,
+                                       HttpSession session,
                                        RedirectAttributes redirectAttributes) {
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
         try {
+            var existing = reviewService.getReviewById(reviewId);
+            if (existing == null) {
+                redirectAttributes.addFlashAttribute("errorMsg", "⚠️ Review not found: " + reviewId);
+                return "redirect:/reviews/manage";
+            }
+            if (!isOwner(existing.getCustomerName(), user)) {
+                redirectAttributes.addFlashAttribute("errorMsg", "⚠️ You can delete only your own reviews.");
+                return "redirect:/reviews/manage";
+            }
             boolean success = reviewService.deleteReview(reviewId);
             if (success) {
                 redirectAttributes.addFlashAttribute("successMsg", "🗑️ Review deleted: " + reviewId);
@@ -167,12 +220,17 @@ public class  ReviewController {
             @RequestParam("cakeName")     String cakeName,
             @RequestParam("rating")       int    rating,
             @RequestParam("comment")      String comment,
+            HttpSession                   session,
             RedirectAttributes            redirectAttributes) {
+        Customer user = getLoggedInUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
 
         try {
-            reviewService.submitReview(customerName, cakeName, rating, comment);
+            reviewService.submitReview(user.getName(), cakeName, rating, comment);
             redirectAttributes.addFlashAttribute("successMsg",
-                "✅ Thank you " + customerName + "! Your review has been submitted and is pending approval.");
+                "✅ Thank you " + user.getName() + "! Your review has been submitted and is pending approval.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg",
                 "❌ Error submitting review: " + e.getMessage());
@@ -215,8 +273,16 @@ public class  ReviewController {
      * Loads ALL reviews (approved + pending) for the admin to manage.
      * Renders: templates/admin-moderation.html
      */
+    @GetMapping("/admin-panel")
+    public String redirectAdminPanel() {
+        return "redirect:/reviews/admin";
+    }
+
     @GetMapping("/admin")
-    public String showAdminPanel(Model model) {
+    public String showAdminPanel(Model model, HttpSession session) {
+        if (session == null || session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         try {
             model.addAttribute("reviews", reviewService.getAllReviews());
         } catch (Exception e) {
@@ -231,7 +297,11 @@ public class  ReviewController {
     @GetMapping("/admin/edit/{id}")
     public String showEditForm(@PathVariable("id") String reviewId,
                                Model model,
+                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         try {
             var review = reviewService.getReviewById(reviewId);
             if (review == null) {
@@ -257,7 +327,11 @@ public class  ReviewController {
             @RequestParam("rating") int rating,
             @RequestParam("comment") String comment,
             @RequestParam(value = "approved", required = false) String approved,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
 
         boolean approvedBool = approved != null;
 
@@ -288,7 +362,11 @@ public class  ReviewController {
     @PostMapping("/admin/approve/{id}")
     public String approveReview(
             @PathVariable("id") String reviewId,
+            HttpSession session,
             RedirectAttributes  redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
 
         try {
             boolean success = reviewService.approveReview(reviewId);
@@ -317,7 +395,11 @@ public class  ReviewController {
     @PostMapping("/admin/delete/{id}")
     public String deleteReview(
             @PathVariable("id") String reviewId,
+            HttpSession session,
             RedirectAttributes  redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
 
         try {
             boolean success = reviewService.deleteReview(reviewId);
@@ -333,5 +415,19 @@ public class  ReviewController {
         }
 
         return "redirect:/reviews/admin";
+    }
+
+    private Customer getLoggedInUser(HttpSession session) {
+        Object user = session.getAttribute("user");
+        return user instanceof Customer ? (Customer) user : null;
+    }
+
+    private boolean isOwner(String reviewCustomerName, Customer user) {
+        if (user == null) {
+            return false;
+        }
+        String expected = user.getName() == null ? "" : user.getName().trim();
+        String current = reviewCustomerName == null ? "" : reviewCustomerName.trim();
+        return !expected.isEmpty() && expected.equalsIgnoreCase(current);
     }
 }

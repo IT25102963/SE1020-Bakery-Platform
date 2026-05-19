@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class ReviewRepository {
      * @throws IOException if the file cannot be written
      */
     public void save(Review review) throws IOException {
+        ensureParentDirectory();
         // BufferedWriter with append=true adds to the file instead of replacing it
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(review.toFileString());
@@ -180,12 +183,21 @@ public class ReviewRepository {
      * @throws IOException if the file cannot be written
      */
     private void rewriteFile(List<Review> reviews) throws IOException {
+        ensureParentDirectory();
         // append=false → this creates a fresh file (overwrites old content)
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
             for (Review r : reviews) {
                 writer.write(r.toFileString());
                 writer.newLine();
             }
+        }
+    }
+
+    private void ensureParentDirectory() throws IOException {
+        Path target = Path.of(filePath).toAbsolutePath().normalize();
+        Path parent = target.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
         }
     }
 }

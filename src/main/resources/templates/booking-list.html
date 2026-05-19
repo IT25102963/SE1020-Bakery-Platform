@@ -43,7 +43,7 @@
     </div>
 </header>
 
-<main class="container py-4">
+<main class="container py-4" id="ordersRoot" th:attr="data-orders-version=${ordersVersion}">
     <!-- Stats Row -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
@@ -160,5 +160,37 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:if="${session.user != null}" th:inline="javascript">
+    (() => {
+        const root = document.getElementById('ordersRoot');
+        if (!root) return;
+        let currentVersion = root.dataset.ordersVersion || '';
+
+        const poll = async () => {
+            if (document.hidden) return;
+            try {
+                const response = await fetch('/bookings/my-orders/version?ts=' + Date.now(), {
+                    cache: 'no-store',
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                if (!data.authenticated) return;
+
+                const nextVersion = String(data.version || '');
+                if (currentVersion && nextVersion && nextVersion !== currentVersion) {
+                    window.location.reload();
+                    return;
+                }
+                currentVersion = nextVersion;
+            } catch (error) {
+                // ignore transient polling errors
+            }
+        };
+
+        setInterval(poll, 4000);
+    })();
+</script>
 </body>
 </html>

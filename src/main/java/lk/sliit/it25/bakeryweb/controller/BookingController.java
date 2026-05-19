@@ -98,21 +98,32 @@ public class BookingController {
 
     @GetMapping("/my-orders")
     public String listBookings(Model model, HttpSession session) {
-        List<Booking> bookings;
-        if (isAdminSession(session)) {
-            bookings = bookingService.getAllBookings();
-        } else {
-            Customer loggedInUser = getLoggedInCustomer(session);
-            if (loggedInUser == null) {
-                return "redirect:/login";
-            }
-            bookings = filterBookingsForCustomer(bookingService.getAllBookings(), loggedInUser);
+        List<Booking> bookings = resolveVisibleBookings(session);
+        if (bookings == null) {
+            return "redirect:/login";
         }
 
         model.addAttribute("bookings", bookings);
         model.addAttribute("readyCount", countReadyForDelivery(bookings));
         model.addAttribute("pendingCount", countPending(bookings));
+        model.addAttribute("ordersVersion", buildOrdersVersion(bookings));
         return "booking-list";
+    }
+
+    @GetMapping("/my-orders/version")
+    @ResponseBody
+    public Map<String, Object> getMyOrdersVersion(HttpSession session) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        List<Booking> bookings = resolveVisibleBookings(session);
+        if (bookings == null) {
+            response.put("authenticated", false);
+            return response;
+        }
+
+        response.put("authenticated", true);
+        response.put("version", buildOrdersVersion(bookings));
+        response.put("count", bookings.size());
+        return response;
     }
 
     @PostMapping("/place-order")
@@ -567,6 +578,29 @@ public class BookingController {
         return allBookings.stream()
                 .filter(booking -> isBookingOwner(booking, user))
                 .toList();
+    }
+
+    private List<Booking> resolveVisibleBookings(HttpSession session) {
+        if (isAdminSession(session)) {
+            return bookingService.getAllBookings();
+        }
+
+        Customer loggedInUser = getLoggedInCustomer(session);
+        if (loggedInUser == null) {
+            return null;
+        }
+        return filterBookingsForCustomer(bookingService.getAllBookings(), loggedInUser);
+    }
+
+    private String buildOrdersVersion(List<Booking> bookings) {
+        StringBuilder key = new StringBuilder();
+        for (Booking booking : bookings) {
+            key.append(safeTrim(booking.getBookingId())).append('|')
+                    .append(safeTrim(booking.getStatus())).append('|')
+                    .append(booking.getQuantity() == null ? 0 : booking.getQuantity()).append('|')
+                    .append(booking.getTotalPrice() == null ? BigDecimal.ZERO : booking.getTotalPrice()).append(';');
+        }
+        return Integer.toHexString(key.toString().hashCode());
     }
 
     private long countPending(List<Booking> bookings) {

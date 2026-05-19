@@ -18,8 +18,8 @@
             <a href="/admin/profile" class="btn btn-primary btn-sm rounded-pill px-3">
                 <i class="fa-solid fa-user-shield me-1"></i> Admin Profile
             </a>
-            <a href="/bookings/my-orders" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="fa-solid fa-clipboard-list me-1"></i> Orders
+            <a href="/bookings/my-orders" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-clipboard-list me-1"></i> Orders Dashboard
             </a>
             <a href="/catalog" class="btn btn-warning btn-sm rounded-pill px-3 text-white">
                 <i class="fa-solid fa-store me-1"></i> Customer Catalog
@@ -96,12 +96,19 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td>
-                                    <div class="d-flex flex-column gap-2">
-                                        <a href="/standard-catalog/edit?id=${c.id}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        <form action="/standard-catalog/delete" method="post">
+                                <td class="text-center">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <a href="/standard-catalog/edit?id=${c.id}"
+                                           class="btn-action btn-edit"
+                                           title="Edit Cake">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <form action="/standard-catalog/delete" method="post" class="d-inline"
+                                              onsubmit="return confirm('Delete this cake from catalog?');">
                                             <input type="hidden" name="id" value="${c.id}">
-                                            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                                            <button class="btn-action btn-delete" type="submit" title="Delete Cake">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
