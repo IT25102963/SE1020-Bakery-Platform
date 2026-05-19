@@ -1,0 +1,2 @@
+# id|name|flavor|size|price|description
+
