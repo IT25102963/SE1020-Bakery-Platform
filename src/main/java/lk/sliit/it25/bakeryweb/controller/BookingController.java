@@ -65,6 +65,11 @@ public class BookingController {
         return "booking-products";
     }
 
+    @GetMapping("/new")
+    public String newBooking() {
+        return "redirect:/bookings/products";
+    }
+
     @GetMapping("/my-orders")
     public String listBookings(Model model) {
         model.addAttribute("bookings", bookingService.getAllBookings());
