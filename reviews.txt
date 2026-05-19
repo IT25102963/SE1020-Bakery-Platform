@@ -1,0 +1,7 @@
+RV-9671E55F|yakshi|chocolate|4|tasty|2026-04-30|false
+RV-C08B4E9D|yakshi|chocolate|3|uyutr|2026-04-30|false
+RV-42E0404D|allahii|chocolate|3|jhgfds|2026-04-30|false
+RV-53A3AD12|allahii|chocolate|3|jhgfds|2026-04-30|false
+RV-C988C74C|allahii|chocolate|4|lkjhgfd|2026-04-30|false
+RV-681F9850|allahii|chocolate|4|lkjhgfdhg|2026-04-30|false
+RV-E0301D3F|yakshi|chocolate|5|jhg|2026-04-30|false
