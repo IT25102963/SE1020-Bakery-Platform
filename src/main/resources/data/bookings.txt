@@ -1,8 +1,4 @@
-B006,Kavindu,0764792300,Classic Tiramisu Slice,Hello,Standard,1,2026-05-14,2026-05-21,1800.00,Completed
-B009,user,0761551417,Classic Tiramisu,,Standard,1,2026-05-20,2026-05-21,1800.00,Pending
-B010,user,0761551417,Creamy Strawberry,,Standard,1,2026-05-20,2026-05-21,2200.00,Pending
-B011,anura,0761551417,Creamy Strawberry,,Standard,1,2026-05-20,2026-05-21,2200.00,Pending
-B012,user,0761551417,Creamy Strawberry,,Standard,1,2026-05-20,2026-05-21,2200.00,Pending
-B013,QA User,0761551417,Creamy Strawberry,test order,Standard,1,2026-05-20,2026-05-22,2200.00,Pending
-B015,anura,0761551417,Creamy Strawberry,,Standard,1,2026-05-20,2026-05-21,2200.00,Pending
 B016,anura susantha,0761551417,banana cake,,Standard,2,2026-05-20,2026-05-21,160.0,Pending
+B017,rohana,0761551417,Creamy Strawberry,,Standard,1,2026-05-20,2026-05-21,2200.00,Pending
+B018,rohana,0761551417,Classic Tiramisu,,Standard,1,2026-05-20,2026-05-21,1800.00,Pending
+B019,susantha,0761551417,Fruit Fiesta Tart,,Standard,1,2026-05-20,2026-05-21,2500.00,Pending

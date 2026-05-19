@@ -1,5 +1,4 @@
-5,banana cake,80.0,Italian Desserts,Coffee infused tiramisu with mascarpone and cocoa dust,/uploads/cakes/af6ba6ac-b05a-4d36-acae-f5c702216129.jpg
-2,Classic Tiramisu,1800.0,Italian Desserts,Coffee infused tiramisu with mascarpone and cocoa dust,
-1,Creamy Strawberry,2200.0,Signature Cakes,Fresh cream cake with strawberry glaze and sponge layers,
-3,Fruit Fiesta Tart,2500.0,Fruit Collection,Buttery tart base topped with seasonal fruits and custard,
-4,Raspberry Choco,2700.0,Chocolate Collection,Dark chocolate tart with raspberry compote and ganache,
+5,Almond Crunch,5100.0,Dessert,Barely sweetened tea time favourite  that is packed with almond meal  giving the lightest whiff of almond.,/uploads/cakes/06d9bd73-6468-4280-9a32-82727081a2ae.webp
+6,Coffee Mocha,3400.0,Dessert,Coffee cake sandwiched with coffee buttercream and covered in our rich coffee mocha frosting,/uploads/cakes/d4b00d73-d5f7-4116-808a-346b321de9b9.webp
+7,DC – 102 1kg Chocolate Treat – 8″,7700.0,Chocolate,1kg Chocolate Treat    Cake placed on white cake board    8″ Diameter,/uploads/cakes/7a93c7c4-eae5-4f1a-bea5-7e038eb2994e.webp
+8,DC – 106 2kg Ribbon Cake – 8″,20000.0,Ribbon Cake,2kg Ribbon Cake covered in cream fondant    Cake placed on a white round cake board    8″ Diameter,/uploads/cakes/8b8c4ab3-586b-4848-a59c-623b60e7921a.webp

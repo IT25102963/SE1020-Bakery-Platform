@@ -184,7 +184,6 @@
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <a href="/custom-requests/submit" class="btn btn-light btn-lg px-4 rounded-pill fw-bold">Start Request</a>
-                    <a href="/reviews/testimonials" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">Read Reviews</a>
                 </div>
             </div>
         </div>
