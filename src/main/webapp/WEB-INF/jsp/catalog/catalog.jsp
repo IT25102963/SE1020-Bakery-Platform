@@ -24,6 +24,11 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link active" href="/catalog">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="/standard-catalog">Manage Cakes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/custom-requests">Custom Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="/delivery">Delivery</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bookings/products">Bookings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/reviews/testimonials">Reviews</a></li>
 
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">

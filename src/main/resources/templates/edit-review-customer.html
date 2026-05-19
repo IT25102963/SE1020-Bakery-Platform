@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Edit Your Review – Sweet Layers Bakery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --cream:   #fdf6ec;
+            --brown:   #5c3317;
+            --rose:    #c0392b;
+            --gold:    #d4a84b;
+            --soft:    #f9ede0;
+            --border:  #e8d5c0;
+            --text:    #3a2010;
+            --muted:   #9a7a60;
+            --shadow:  0 6px 28px rgba(92,51,23,0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--cream);
+            background-image:
+                    radial-gradient(circle at 10% 20%, rgba(212,168,75,0.07) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(192,57,43,0.05) 0%, transparent 50%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        nav {
+            background: var(--brown);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 22px;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            margin-left: 28px;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+        .page-header {
+            text-align: center;
+            padding: 42px 20px 22px;
+        }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 34px;
+            color: var(--brown);
+            margin-bottom: 10px;
+        }
+        .page-header p { color: var(--muted); }
+
+        .card {
+            background: white;
+            max-width: 640px;
+            margin: 0 auto 40px;
+            border-radius: 16px;
+            padding: 34px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .meta code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background: var(--soft);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 999px;
+            color: var(--brown);
+        }
+
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Lato', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            background: var(--soft);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212,168,75,0.15);
+            background: white;
+        }
+        textarea { min-height: 130px; resize: vertical; }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 160px;
+            font-size: 13px;
+        }
+        .btn-save { background: var(--brown); color: white; }
+        .btn-save:hover { background: var(--rose); }
+        .btn-cancel { background: rgba(92,51,23,0.08); color: var(--brown); }
+        .btn-cancel:hover { background: rgba(92,51,23,0.12); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="#">🍰 Sweet Layers Bakery</a>
+    <div class="nav-links">
+        <a href="/reviews/new">Write a Review</a>
+        <a href="/reviews/manage">Manage Reviews</a>
+        <a href="/reviews/testimonials">Testimonials</a>
+        <a href="/reviews/admin">Admin Panel</a>
+    </div>
+</nav>
+
+<div class="page-header">
+    <h1>Edit Your Review</h1>
+    <p>Update your details and save your changes.</p>
+</div>
+
+<div class="card">
+    <div class="meta">
+        <div>Review ID: <code th:text="${review.reviewId}">RV-XXXX</code></div>
+        <div>Posted: <code th:text="${review.datePosted}">2026-01-01</code></div>
+    </div>
+
+    <form th:action="@{/reviews/edit/{id}(id=${review.reviewId})}" method="post">
+        <div class="form-group">
+            <label for="customerName">Your Full Name</label>
+            <input id="customerName" name="customerName" type="text" maxlength="100" required
+                   th:value="${review.customerName}"/>
+        </div>
+
+        <div class="form-group">
+            <label for="cakeName">Cake / Product Name</label>
+            <input id="cakeName" name="cakeName" type="text" maxlength="100" required
+                   th:value="${review.cakeName}"/>
+        </div>
+
+        <div class="form-group">
+            <label for="rating">Rating (1–5)</label>
+            <input id="rating" name="rating" type="number" min="1" max="5" required
+                   th:value="${review.rating}"/>
+        </div>
+
+        <div class="form-group">
+            <label for="comment">Your Review</label>
+            <textarea id="comment" name="comment" maxlength="500" required
+                      th:text="${review.comment}">Comment</textarea>
+        </div>
+
+        <div class="actions">
+            <a class="btn btn-cancel" href="/reviews/manage">← Back</a>
+            <button class="btn btn-save" type="submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+
