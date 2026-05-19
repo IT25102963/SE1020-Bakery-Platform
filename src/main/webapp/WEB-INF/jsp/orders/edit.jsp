@@ -1,10 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="lk.sliit.it25.bakeryweb.customrequests.CustomRequest" %>
+<%@ page import="lk.sliit.it25.bakeryweb.orders.Order" %>
+<%@ page import="java.util.Date" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CakeForge - Edit Request</title>
+    <title>CakeForge - Edit Order</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,8 +37,8 @@
             </a>
             <div class="ms-auto d-flex align-items-center">
                 <a href="#" class="nav-link nav-link-custom">Catalog</a>
-                <a href="#" class="nav-link nav-link-custom">Bookings</a>
-                <a href="/custom-requests" class="nav-link nav-link-custom nav-pill-active">Custom Requests</a>
+                <a href="/orders" class="nav-link nav-link-custom nav-pill-active">Orders</a>
+                <a href="/custom-requests" class="nav-link nav-link-custom">Custom Requests</a>
             </div>
         </div>
     </nav>
@@ -52,52 +53,41 @@
                                 <i class="bi bi-pencil-square fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="fw-bold mb-0" style="color: #1e293b;">Edit Request</h3>
-                                <p class="text-muted mb-0">Update your custom cake specifications.</p>
+                                <h3 class="fw-bold mb-0" style="color: #1e293b;">Edit Order</h3>
+                                <p class="text-muted mb-0">Update order status and details.</p>
                             </div>
                         </div>
 
-                        <% CustomRequest req = (CustomRequest) request.getAttribute("request"); %>
-                        <% if(req != null) { %>
-                        <form action="/custom-requests/edit" method="post">
-                            <input type="hidden" name="requestId" value="<%= req.getRequestId() %>">
-                            <input type="hidden" name="customerName" value="<%= req.getCustomerName() %>">
+                        <% Order order = new Order("101", "John Doe", new Date(), "Shipped"); %>
+                        <% if(order != null) { %>
+                        <form action="/orders/edit" method="post">
+                            <input type="hidden" name="orderId" value="<%= order.getOrderId() %>">
 
                             <div class="mb-4 p-3 rounded-3 bg-light border-0">
                                 <div class="row">
                                     <div class="col-6">
-                                        <p class="mb-1 text-muted small fw-bold text-uppercase">Request ID</p>
-                                        <p class="mb-0 fw-bold" style="color: #fb7185;">#<%= req.getRequestId() %></p>
+                                        <p class="mb-1 text-muted small fw-bold text-uppercase">Order ID</p>
+                                        <p class="mb-0 fw-bold" style="color: #fb7185;">#<%= order.getOrderId() %></p>
                                     </div>
                                     <div class="col-6">
                                         <p class="mb-1 text-muted small fw-bold text-uppercase">Customer</p>
-                                        <p class="mb-0 fw-bold"><%= req.getCustomerName() %></p>
+                                        <p class="mb-0 fw-bold"><%= order.getCustomerName() %></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Number of Tiers</label>
-                                <input type="number" name="tiers" value="<%= req.getTiers() %>" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Cake Theme</label>
-                                <input type="text" name="theme" value="<%= req.getTheme() %>" class="form-control" required>
-                            </div>
-
                             <div class="mb-4">
-                                <label class="form-label">Status</label>
+                                <label class="form-label">Order Status</label>
                                 <select name="status" class="form-select">
-                                    <option value="Pending" <%= req.getStatus().equals("Pending") ? "selected" : "" %>>Pending</option>
-                                    <option value="Approved" <%= req.getStatus().equals("Approved") ? "selected" : "" %>>Approved</option>
-                                    <option value="Completed" <%= req.getStatus().equals("Completed") ? "selected" : "" %>>Completed</option>
+                                    <option value="Pending" <%= order.getStatus().equals("Pending") ? "selected" : "" %>>Pending</option>
+                                    <option value="Shipped" <%= order.getStatus().equals("Shipped") ? "selected" : "" %>>Shipped</option>
+                                    <option value="Delivered" <%= order.getStatus().equals("Delivered") ? "selected" : "" %>>Delivered</option>
                                 </select>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="/custom-requests" class="btn btn-light px-4 py-2 border-0 fw-semibold" style="color: #64748b;">Cancel</a>
-                                <button type="submit" class="btn btn-rose px-5 py-2">Update Request</button>
+                                <a href="/orders" class="btn btn-light px-4 py-2 border-0 fw-semibold" style="color: #64748b;">Cancel</a>
+                                <button type="submit" class="btn btn-rose px-5 py-2">Update Order</button>
                             </div>
                         </form>
                         <% } else { %>
@@ -105,9 +95,9 @@
                                 <div class="bg-red-light p-3 rounded-circle d-inline-block mb-3" style="background-color: #ffe4e6; color: #f43f5e;">
                                     <i class="bi bi-exclamation-triangle-fill fs-2"></i>
                                 </div>
-                                <h4 class="fw-bold">Request Not Found</h4>
-                                <p class="text-muted mb-4">The request you are trying to edit doesn't exist.</p>
-                                <a href="/custom-requests" class="btn btn-rose px-4 py-2">Back to Dashboard</a>
+                                <h4 class="fw-bold">Order Not Found</h4>
+                                <p class="text-muted mb-4">The order you are trying to edit doesn't exist.</p>
+                                <a href="/orders" class="btn btn-rose px-4 py-2">Back to List</a>
                             </div>
                         <% } %>
                     </div>
