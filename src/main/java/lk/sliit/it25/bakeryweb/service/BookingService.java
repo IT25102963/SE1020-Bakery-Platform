@@ -30,6 +30,17 @@ public class BookingService {
         return repository.findAll();
     }
 
+    public List<Booking> getBookingsByPhone(String phone) {
+        if (phone == null || phone.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        String normalizedPhone = phone.trim();
+        return getAllBookings().stream()
+                .filter(booking -> normalizedPhone.equals(booking.getPhone()))
+                .toList();
+    }
+
     public Optional<Booking> getBookingById(String id) {
         return repository.findById(id);
     }

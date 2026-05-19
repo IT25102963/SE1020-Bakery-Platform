@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,11 +72,24 @@ public class BookingController {
     }
 
     @GetMapping("/my-orders")
-    public String listBookings(Model model) {
+    public String listBookings(HttpSession session, Model model) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
         model.addAttribute("bookings", bookingService.getAllBookings());
         model.addAttribute("readyCount", bookingService.getReadyForDeliveryCount());
         model.addAttribute("pendingCount", bookingService.getPendingCount());
         return "booking-list";
+    }
+
+    @GetMapping("/order-history")
+    public String orderHistory(HttpSession session, Model model) {
+        String customerPhone = getCustomerPhone(session);
+        List<Booking> bookings = bookingService.getBookingsByPhone(customerPhone);
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("customerPhone", customerPhone);
+        return "order-history";
     }
 
     @PostMapping("/place-order")
@@ -114,6 +128,7 @@ public class BookingController {
                 bookingService.createBooking(newBooking);
             }
             cartService.clearCart(session);
+            session.setAttribute("lastOrderPhone", booking.getPhone());
             redirectAttributes.addFlashAttribute("successMessage",
                     "All bookings from your cart have been placed successfully!");
         } else {
@@ -129,11 +144,12 @@ public class BookingController {
                 booking.setTotalPrice(bookingService.calculateTotalPrice(booking.getCakeName(), booking.getQuantity() == null ? 1 : booking.getQuantity()));
             }
             Booking saved = bookingService.createBooking(booking);
+            session.setAttribute("lastOrderPhone", booking.getPhone());
             redirectAttributes.addFlashAttribute("successMessage",
                     "Booking created successfully with ID " + saved.getBookingId());
         }
 
-        return "redirect:/bookings/my-orders";
+        return isAdmin(session) ? "redirect:/bookings/my-orders" : "redirect:/bookings/order-history";
     }
 
     @GetMapping("/place-order")
@@ -192,7 +208,7 @@ public class BookingController {
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
-            return "redirect:/bookings/my-orders";
+            return "redirect:/bookings/order-history";
         }
         model.addAttribute("booking", bookingOptional.get());
         return "booking-receipt";
@@ -200,7 +216,12 @@ public class BookingController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") String bookingId, Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
@@ -217,7 +238,12 @@ public class BookingController {
             @Valid @ModelAttribute("booking") Booking booking,
             BindingResult bindingResult,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
         if (bindingResult.hasErrors()) {
             booking.setBookingId(bookingId);
             bookingService.getBookingById(bookingId).ifPresent(existing -> {
@@ -240,7 +266,12 @@ public class BookingController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteBooking(@PathVariable("id") String bookingId, RedirectAttributes redirectAttributes) {
+    public String deleteBooking(@PathVariable("id") String bookingId, RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
         boolean deleted = bookingService.deleteBooking(bookingId);
         if (deleted) {
             redirectAttributes.addFlashAttribute("successMessage", "Booking deleted successfully");
@@ -251,7 +282,12 @@ public class BookingController {
     }
 
     @GetMapping("/cancel/{id}")
-    public String cancelBooking(@PathVariable("id") String bookingId, RedirectAttributes redirectAttributes) {
+    public String cancelBooking(@PathVariable("id") String bookingId, RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
         boolean cancelled = bookingService.cancelBooking(bookingId);
         if (cancelled) {
             redirectAttributes.addFlashAttribute("successMessage", "Booking cancelled successfully");
@@ -259,5 +295,25 @@ public class BookingController {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
         }
         return "redirect:/bookings/my-orders";
+    }
+
+    private boolean isAdmin(HttpSession session) {
+        return Arrays.asList("role", "userRole", "loggedInRole", "userType", "accountType")
+                .stream()
+                .map(session::getAttribute)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .anyMatch(value -> "ADMIN".equalsIgnoreCase(value) || "ADMIN_USER".equalsIgnoreCase(value));
+    }
+
+    private String getCustomerPhone(HttpSession session) {
+        return Arrays.asList("customerPhone", "userPhone", "phone", "loggedInPhone", "lastOrderPhone")
+                .stream()
+                .map(session::getAttribute)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .filter(value -> !value.isBlank())
+                .findFirst()
+                .orElse("");
     }
 }
