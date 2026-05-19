@@ -63,7 +63,7 @@
                         <th>Delivery Date</th>
                         <th>Total</th>
                         <th>Status</th>
-                        <th class="text-center">Receipt</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,9 +85,17 @@
                                   th:text="${booking.status}"></span>
                         </td>
                         <td class="text-center">
-                            <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt">
-                                <i class="fa-solid fa-receipt"></i>
-                            </a>
+                            <div class="d-flex justify-content-center">
+                                <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt">
+                                    <i class="fa-solid fa-receipt"></i>
+                                </a>
+                                <a th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}" class="btn-action btn-edit" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     <tr th:if="${bookings.empty}">

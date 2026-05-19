@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -57,24 +58,33 @@ public class BookingController {
     }
 
     @GetMapping
-    public String bookingsHome() {
+    public String bookingsHome(HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
         return "redirect:/bookings/products";
     }
 
     @GetMapping("/products")
-    public String productList() {
+    public String productList(HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
         return "booking-products";
     }
 
     @GetMapping("/new")
-    public String newBooking() {
+    public String newBooking(HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
         return "redirect:/bookings/products";
     }
 
     @GetMapping("/my-orders")
     public String listBookings(HttpSession session, Model model) {
         if (!isAdmin(session)) {
-            return "redirect:/bookings/order-history";
+            return isCustomer(session) ? "redirect:/bookings/order-history" : "redirect:/admin/login";
         }
 
         model.addAttribute("bookings", bookingService.getAllBookings());
@@ -85,6 +95,13 @@ public class BookingController {
 
     @GetMapping("/order-history")
     public String orderHistory(HttpSession session, Model model) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         String customerPhone = getCustomerPhone(session);
         List<Booking> bookings = bookingService.getBookingsByPhone(customerPhone);
         model.addAttribute("bookings", bookings);
@@ -99,6 +116,13 @@ public class BookingController {
             Model model,
             RedirectAttributes redirectAttributes,
             HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         if (bindingResult.hasErrors()) {
             booking.setBookingDate(LocalDate.now());
             booking.setDeliveryDate(LocalDate.now().plusDays(1));
@@ -153,7 +177,10 @@ public class BookingController {
     }
 
     @GetMapping("/place-order")
-    public String redirectToCatalog() {
+    public String redirectToCatalog(HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
         return "redirect:/bookings/products";
     }
 
@@ -161,10 +188,19 @@ public class BookingController {
 
     @GetMapping("/cart")
     public String viewCart(HttpSession session, Model model) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         List<CartItem> cart = cartService.getCart(session);
         model.addAttribute("cartItems", cart);
         
         Booking checkoutInfo = new Booking();
+        checkoutInfo.setCustomerName(getCustomerName(session));
+        checkoutInfo.setPhone(getCustomerPhone(session));
         checkoutInfo.setBookingDate(LocalDate.now());
         checkoutInfo.setDeliveryDate(LocalDate.now().plusDays(1));
         checkoutInfo.setOrderType("Standard");
@@ -179,6 +215,13 @@ public class BookingController {
             @RequestParam("quantity") Integer quantity,
             HttpSession session
     ) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         cartService.updateQuantity(session, cakeName, quantity);
         return "redirect:/bookings/cart";
     }
@@ -189,6 +232,13 @@ public class BookingController {
             @RequestParam("quantity") Integer quantity,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         BigDecimal unitPrice = bookingService.getCakePrices().getOrDefault(cakeName, BigDecimal.ZERO);
         CartItem item = new CartItem(cakeName, quantity, unitPrice);
         cartService.addToCart(session, item);
@@ -198,18 +248,38 @@ public class BookingController {
 
     @GetMapping("/cart/remove/{cakeName}")
     public String removeFromCart(@PathVariable("cakeName") String cakeName, HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         cartService.removeFromCart(session, cakeName);
         return "redirect:/bookings/cart";
     }
 
     @GetMapping("/receipt/{id}")
     public String showReceipt(@PathVariable("id") String bookingId, Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
             return "redirect:/bookings/order-history";
         }
+        if (!isOwnBooking(bookingOptional.get(), session)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You can only view your own receipts");
+            return "redirect:/bookings/order-history";
+        }
+
         model.addAttribute("booking", bookingOptional.get());
         return "booking-receipt";
     }
@@ -218,14 +288,21 @@ public class BookingController {
     public String showEditForm(@PathVariable("id") String bookingId, Model model,
             RedirectAttributes redirectAttributes,
             HttpSession session) {
-        if (!isAdmin(session)) {
-            return "redirect:/bookings/order-history";
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
         }
 
         Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
         if (bookingOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
-            return "redirect:/bookings/my-orders";
+            return isAdmin(session) ? "redirect:/bookings/my-orders" : "redirect:/bookings/order-history";
+        }
+        if (!isOwnBooking(bookingOptional.get(), session)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You can only edit your own orders");
+            return "redirect:/bookings/order-history";
         }
 
         model.addAttribute("booking", bookingOptional.get());
@@ -240,13 +317,22 @@ public class BookingController {
             Model model,
             RedirectAttributes redirectAttributes,
             HttpSession session) {
-        if (!isAdmin(session)) {
+        if (isAdmin(session)) {
+            return "redirect:/bookings/my-orders";
+        }
+        if (!isCustomer(session)) {
+            return "redirect:/login";
+        }
+
+        Optional<Booking> existingBooking = bookingService.getBookingById(bookingId);
+        if (existingBooking.isEmpty() || !isOwnBooking(existingBooking.get(), session)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You can only update your own orders");
             return "redirect:/bookings/order-history";
         }
 
         if (bindingResult.hasErrors()) {
             booking.setBookingId(bookingId);
-            bookingService.getBookingById(bookingId).ifPresent(existing -> {
+            existingBooking.ifPresent(existing -> {
                 booking.setBookingDate(existing.getBookingDate());
                 booking.setDeliveryDate(existing.getDeliveryDate());
                 booking.setStatus(existing.getStatus());
@@ -262,19 +348,47 @@ public class BookingController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
         }
-        return "redirect:/bookings/my-orders";
+        return isAdmin(session) ? "redirect:/bookings/my-orders" : "redirect:/bookings/order-history";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteBooking(@PathVariable("id") String bookingId, RedirectAttributes redirectAttributes,
             HttpSession session) {
-        if (!isAdmin(session)) {
+        if (!isAdmin(session) && !isCustomer(session)) {
+            return "redirect:/login";
+        }
+
+        Optional<Booking> bookingOptional = bookingService.getBookingById(bookingId);
+        if (bookingOptional.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
+            return isAdmin(session) ? "redirect:/bookings/my-orders" : "redirect:/bookings/order-history";
+        }
+        if (isCustomer(session) && !isOwnBooking(bookingOptional.get(), session)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You can only delete your own orders");
             return "redirect:/bookings/order-history";
         }
 
         boolean deleted = bookingService.deleteBooking(bookingId);
         if (deleted) {
             redirectAttributes.addFlashAttribute("successMessage", "Booking deleted successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
+        }
+        return isAdmin(session) ? "redirect:/bookings/my-orders" : "redirect:/bookings/order-history";
+    }
+
+    @PostMapping("/status/{id}")
+    public String updateStatus(@PathVariable("id") String bookingId,
+            @RequestParam("status") String status,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        if (!isAdmin(session)) {
+            return "redirect:/bookings/order-history";
+        }
+
+        boolean updated = bookingService.updateBookingStatus(bookingId, status);
+        if (updated) {
+            redirectAttributes.addFlashAttribute("successMessage", "Booking status updated successfully");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Booking not found");
         }
@@ -298,6 +412,10 @@ public class BookingController {
     }
 
     private boolean isAdmin(HttpSession session) {
+        if (session.getAttribute("admin") != null) {
+            return true;
+        }
+
         return Arrays.asList("role", "userRole", "loggedInRole", "userType", "accountType")
                 .stream()
                 .map(session::getAttribute)
@@ -306,7 +424,16 @@ public class BookingController {
                 .anyMatch(value -> "ADMIN".equalsIgnoreCase(value) || "ADMIN_USER".equalsIgnoreCase(value));
     }
 
+    private boolean isCustomer(HttpSession session) {
+        return session.getAttribute("user") != null;
+    }
+
     private String getCustomerPhone(HttpSession session) {
+        String phoneFromUser = getSessionObjectString(session.getAttribute("user"), "getPhone");
+        if (!phoneFromUser.isBlank()) {
+            return phoneFromUser;
+        }
+
         return Arrays.asList("customerPhone", "userPhone", "phone", "loggedInPhone", "lastOrderPhone")
                 .stream()
                 .map(session::getAttribute)
@@ -315,5 +442,28 @@ public class BookingController {
                 .filter(value -> !value.isBlank())
                 .findFirst()
                 .orElse("");
+    }
+
+    private String getCustomerName(HttpSession session) {
+        return getSessionObjectString(session.getAttribute("user"), "getName");
+    }
+
+    private boolean isOwnBooking(Booking booking, HttpSession session) {
+        String customerPhone = getCustomerPhone(session);
+        return !customerPhone.isBlank() && customerPhone.equals(booking.getPhone());
+    }
+
+    private String getSessionObjectString(Object sessionObject, String methodName) {
+        if (sessionObject == null) {
+            return "";
+        }
+
+        try {
+            Method method = sessionObject.getClass().getMethod(methodName);
+            Object value = method.invoke(sessionObject);
+            return value instanceof String text ? text.trim() : "";
+        } catch (ReflectiveOperationException ex) {
+            return "";
+        }
     }
 }

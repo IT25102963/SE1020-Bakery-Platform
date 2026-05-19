@@ -21,12 +21,26 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/products}">Catalog</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/order-history}">Order History</a></li>
-                <li class="nav-item ms-lg-3">
+                <li class="nav-item" th:if="${session.user != null}">
+                    <a class="nav-link" th:href="@{/bookings/order-history}">Order History</a>
+                </li>
+                <li class="nav-item ms-lg-3" th:if="${session.user != null}">
                     <a th:href="@{/bookings/cart}" class="nav-link cart-icon-wrapper">
                         <i class="fa-solid fa-cart-shopping fa-lg"></i>
                         <span class="cart-badge" th:text="${cartCount}">0</span>
                     </a>
+                </li>
+                <li class="nav-item ms-lg-2" th:if="${session.user == null}">
+                    <a th:href="@{/login}" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Login</a>
+                </li>
+                <li class="nav-item ms-lg-2" th:if="${session.user == null}">
+                    <a th:href="@{/register}" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Register</a>
+                </li>
+                <li class="nav-item ms-lg-2" th:if="${session.user != null}">
+                    <a th:href="@{/profile}" class="nav-link">Profile</a>
+                </li>
+                <li class="nav-item ms-lg-2" th:if="${session.user != null}">
+                    <a th:href="@{/logout}" class="nav-link text-danger">Logout</a>
                 </li>
             </ul>
         </div>
@@ -53,7 +67,7 @@
                     <div class="product-card-body">
                         <h6>Creamy Strawberry</h6>
                         <p class="product-price">LKR 2,200.00</p>
-                        <form th:action="@{/bookings/cart/add}" method="post">
+                        <form th:if="${session.user != null}" th:action="@{/bookings/cart/add}" method="post">
                             <input type="hidden" name="cakeName" value="Creamy Strawberry Cake">
                             <div class="input-group mb-2">
                                 <span class="input-group-text bg-white border-end-0">Qty</span>
@@ -63,6 +77,9 @@
                                 <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
                             </button>
                         </form>
+                        <a th:if="${session.user == null}" th:href="@{/login}" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Order
+                        </a>
                     </div>
                 </div>
             </div>
@@ -73,7 +90,7 @@
                     <div class="product-card-body">
                         <h6>Classic Tiramisu</h6>
                         <p class="product-price">LKR 1,800.00</p>
-                        <form th:action="@{/bookings/cart/add}" method="post">
+                        <form th:if="${session.user != null}" th:action="@{/bookings/cart/add}" method="post">
                             <input type="hidden" name="cakeName" value="Classic Tiramisu Slice">
                             <div class="input-group mb-2">
                                 <span class="input-group-text bg-white border-end-0">Qty</span>
@@ -83,6 +100,9 @@
                                 <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
                             </button>
                         </form>
+                        <a th:if="${session.user == null}" th:href="@{/login}" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Order
+                        </a>
                     </div>
                 </div>
             </div>
@@ -93,7 +113,7 @@
                     <div class="product-card-body">
                         <h6>Fruit Fiesta Tart</h6>
                         <p class="product-price">LKR 2,500.00</p>
-                        <form th:action="@{/bookings/cart/add}" method="post">
+                        <form th:if="${session.user != null}" th:action="@{/bookings/cart/add}" method="post">
                             <input type="hidden" name="cakeName" value="Fruit Fiesta Tart">
                             <div class="input-group mb-2">
                                 <span class="input-group-text bg-white border-end-0">Qty</span>
@@ -103,6 +123,9 @@
                                 <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
                             </button>
                         </form>
+                        <a th:if="${session.user == null}" th:href="@{/login}" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Order
+                        </a>
                     </div>
                 </div>
             </div>
@@ -113,7 +136,7 @@
                     <div class="product-card-body">
                         <h6>Raspberry Choco</h6>
                         <p class="product-price">LKR 2,700.00</p>
-                        <form th:action="@{/bookings/cart/add}" method="post">
+                        <form th:if="${session.user != null}" th:action="@{/bookings/cart/add}" method="post">
                             <input type="hidden" name="cakeName" value="Raspberry Choco Tart">
                             <div class="input-group mb-2">
                                 <span class="input-group-text bg-white border-end-0">Qty</span>
@@ -123,6 +146,9 @@
                                 <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
                             </button>
                         </form>
+                        <a th:if="${session.user == null}" th:href="@{/login}" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Order
+                        </a>
                     </div>
                 </div>
             </div>

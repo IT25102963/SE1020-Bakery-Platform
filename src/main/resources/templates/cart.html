@@ -19,6 +19,8 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" th:href="@{/bookings/products}">Catalog</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/bookings/order-history}">Order History</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/profile}">Profile</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" th:href="@{/logout}">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -115,7 +117,7 @@
                             <label class="form-label">Order Type</label>
                             <select th:field="*{orderType}" class="form-select">
                                 <option value="Standard">Standard</option>
-                                <option value="Express">Express</option>
+                                <option value="Custom">Custom</option>
                             </select>
                         </div>
                     </div>

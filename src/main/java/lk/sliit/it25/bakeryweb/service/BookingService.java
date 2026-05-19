@@ -53,6 +53,10 @@ public class BookingService {
         return repository.delete(id);
     }
 
+    public boolean updateBookingStatus(String id, String status) {
+        return repository.updateStatus(id, status);
+    }
+
     public boolean cancelBooking(String id) {
         return repository.cancel(id);
     }

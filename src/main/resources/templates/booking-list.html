@@ -17,8 +17,8 @@
         </a>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/products}">Catalog</a></li>
-                <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/my-orders}">Bookings</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/my-orders}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" th:href="@{/logout}">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -29,9 +29,6 @@
         <div>
             <h1>Dashboard</h1>
             <p>Manage customer orders and delivery readiness.</p>
-        </div>
-        <div class="mb-2">
-            <a th:href="@{/bookings/products}" class="btn btn-warning rounded-pill"><i class="fa-solid fa-plus me-2"></i> New Catalog Order</a>
         </div>
     </div>
 </header>
@@ -91,6 +88,7 @@
                         <th>Delivery Date</th>
                         <th>Total</th>
                         <th>Status</th>
+                        <th>Status Change</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -116,16 +114,28 @@
                                  booking.status == 'Delivered' ? 'status-delivered' : 'status-cancelled')}"
                                   th:text="${booking.status}"></span>
                         </td>
+                        <td>
+                            <form th:action="@{/bookings/status/{id}(id=${booking.bookingId})}" method="post" class="d-flex gap-2 align-items-center">
+                                <select name="status" class="form-select form-select-sm status-select" aria-label="Order status">
+                                    <option value="Pending" th:selected="${booking.status == 'Pending'}">Pending</option>
+                                    <option value="Confirmed" th:selected="${booking.status == 'Confirmed'}">Confirmed</option>
+                                    <option value="Ready for Delivery" th:selected="${booking.status == 'Ready for Delivery' || booking.status == 'Ready'}">Ready</option>
+                                    <option value="Delivered" th:selected="${booking.status == 'Delivered'}">Delivered</option>
+                                    <option value="Cancelled" th:selected="${booking.status == 'Cancelled'}">Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn-action btn-status" title="Update Status">
+                                    <i class="fa-solid fa-rotate"></i>
+                                </button>
+                            </form>
+                        </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center">
-                                <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt"><i class="fa-solid fa-receipt"></i></a>
-                                <a th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}" class="btn-action btn-edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <a th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </td>
                     </tr>
                     <tr th:if="${bookings.empty}">
-                        <td colspan="7" class="text-center py-5 text-muted">No bookings found.</td>
+                        <td colspan="8" class="text-center py-5 text-muted">No bookings found.</td>
                     </tr>
                 </tbody>
             </table>

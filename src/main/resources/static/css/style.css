@@ -168,6 +168,13 @@ body {
     box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4);
 }
 
+.auth-nav-btn {
+    min-width: 90px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Tables */
 .table {
     border-radius: var(--radius-md);
@@ -320,6 +327,12 @@ body {
     color: #fa5252; 
 }
 .btn-delete:hover { background-color: #fa5252; color: white !important; }
+
+.status-select {
+    min-width: 150px;
+    border-radius: 10px;
+    font-weight: 600;
+}
 
 .table tbody tr {
     transition: all 0.2s ease;

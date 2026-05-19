@@ -14,7 +14,7 @@
         <a class="navbar-brand brand-mark d-flex align-items-center gap-2" th:href="@{/bookings/products}"><img th:src="@{/theme/img/logo.png}" alt="CakeCraft logo" class="brand-logo">CakeCraft</a>
         <div class="navbar-nav ms-auto">
             <a class="nav-link" th:href="@{/bookings/products}">Product List</a>
-            <a class="nav-link" th:href="@{/bookings/my-orders}">My Orders</a>
+            <a class="nav-link" th:href="@{/bookings/order-history}">Order History</a>
         </div>
     </div>
 </nav>
@@ -92,7 +92,7 @@
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Booking</button>
-                    <a th:href="@{/bookings/my-orders}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                    <a th:href="@{/bookings/order-history}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
                 </div>
             </form>
         </div>
