@@ -13,13 +13,16 @@
 <body>
 <nav class="navbar navbar-expand-lg cake-navbar">
     <div class="container">
-        <a class="navbar-brand" href="/catalog">
-            <img src="/theme/img/logo.png" alt="CakeForge" class="brand-logo">
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/bookings/products">
+            <img src="${pageContext.request.contextPath}/img/cake-brand.png" alt="CakeForge" class="brand-logo">
             <span>CakeForge</span>
         </a>
-        <div class="ms-auto d-flex gap-2">
-            <a href="/admin/register" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Admin Register</a>
-            <a href="/login" class="btn btn-outline-secondary btn-sm rounded-pill px-4 auth-nav-btn">User Login</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/products">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/my-orders">Bookings</a></li>
+                <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/delivery">Delivery</a></li>
+            </ul>
         </div>
     </div>
 </nav>

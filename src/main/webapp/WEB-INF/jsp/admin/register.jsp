@@ -18,7 +18,6 @@
         </a>
         <div class="ms-auto d-flex gap-2">
             <a href="/admin/login" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Admin Login</a>
-            <a href="/register" class="btn btn-outline-secondary btn-sm rounded-pill px-4 auth-nav-btn">User Register</a>
         </div>
     </div>
 </nav>

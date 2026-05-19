@@ -1,6 +1,7 @@
 package lk.sliit.it25.bakeryweb.controller;
 
 import lk.sliit.it25.bakeryweb.service.DeliveryScheduleService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +20,19 @@ public class DeliverySchedulerController {
     }
 
     @GetMapping
-    public String showScheduler(Model model) {
+    public String showScheduler(Model model, HttpSession session) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         model.addAttribute("slots", deliveryScheduleService.getRoster());
         return "delivery/scheduler";
     }
 
     @GetMapping("/details")
-    public String showDetails(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes) {
+    public String showDetails(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         return deliveryScheduleService.getSlotById(slotId)
                 .map(slot -> {
                     model.addAttribute("slot", slot);
@@ -38,7 +45,10 @@ public class DeliverySchedulerController {
     }
 
     @GetMapping("/edit")
-    public String showEditPage(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditPage(@RequestParam String slotId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         return deliveryScheduleService.getSlotById(slotId)
                 .map(slot -> {
                     model.addAttribute("slot", slot);
@@ -56,7 +66,11 @@ public class DeliverySchedulerController {
                                @RequestParam String address,
                                @RequestParam String deliveryDate,
                                @RequestParam String deliveryTime,
+                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         if (bookingId.isBlank() || customerName.isBlank() || address.isBlank() || deliveryDate.isBlank() || deliveryTime.isBlank()) {
             redirectAttributes.addFlashAttribute("message", "All fields are required.");
             return "redirect:/delivery";
@@ -81,7 +95,11 @@ public class DeliverySchedulerController {
                              @RequestParam String address,
                              @RequestParam String deliveryDate,
                              @RequestParam String deliveryTime,
+                             HttpSession session,
                              RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         if (slotId.isBlank() || customerName.isBlank() || address.isBlank() || deliveryDate.isBlank() || deliveryTime.isBlank()) {
             redirectAttributes.addFlashAttribute("message", "All fields are required.");
             return "redirect:/delivery";
@@ -93,7 +111,10 @@ public class DeliverySchedulerController {
     }
 
     @PostMapping("/cancel")
-    public String cancelSlot(@RequestParam String slotId, RedirectAttributes redirectAttributes) {
+    public String cancelSlot(@RequestParam String slotId, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
         boolean removed = deliveryScheduleService.cancelSlot(slotId);
         redirectAttributes.addFlashAttribute("message", removed ? "Delivery slot cancelled." : "Slot not found.");
         return "redirect:/delivery";

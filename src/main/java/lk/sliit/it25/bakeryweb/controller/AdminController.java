@@ -50,9 +50,8 @@ public class AdminController {
         Admin loggedInAdmin = repository.authenticate(email, password);
 
         if (loggedInAdmin != null) {
-            session.setAttribute("admin", loggedInAdmin); // Saving as "admin"!
-            session.removeAttribute("user");
-            return "redirect:/catalog"; // We will build the cake-adding dashboard next
+            session.setAttribute("admin", loggedInAdmin);
+            return "redirect:/delivery";
         } else {
             model.addAttribute("error", "Invalid Admin Credentials!");
             return "admin/login";

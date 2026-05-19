@@ -26,23 +26,6 @@
                 <li class="nav-item"><a class="nav-link active" href="/catalog">Catalog</a></li>
 
                 <c:choose>
-                    <c:when test="${not empty sessionScope.user}">
-                        <c:set var="userAvatar" value="${sessionScope.user.photoUrl}" />
-                        <c:if test="${empty userAvatar}">
-                            <c:set var="userAvatar" value="https://ui-avatars.com/api/?name=${fn:replace(sessionScope.user.name,' ','+')}&background=ff6a88&color=ffffff&size=96" />
-                        </c:if>
-
-                        <li class="nav-item dropdown ms-lg-3 profile-menu">
-                            <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="${userAvatar}" alt="Profile" class="profile-avatar">
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end profile-dropdown">
-                                <li><a class="dropdown-item" href="/profile"><i class="fa-solid fa-user me-2"></i>View Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
-                            </ul>
-                        </li>
-                    </c:when>
                     <c:when test="${not empty sessionScope.admin}">
                         <c:set var="adminAvatar" value="https://ui-avatars.com/api/?name=${fn:replace(sessionScope.admin.name,' ','+')}&background=fda085&color=ffffff&size=96" />
                         <li class="nav-item dropdown ms-lg-3 profile-menu">
@@ -58,13 +41,7 @@
                     </c:when>
                     <c:otherwise>
                         <li class="nav-item ms-lg-2">
-                            <a href="/login" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Login</a>
-                        </li>
-                        <li class="nav-item ms-lg-2">
-                            <a href="/register" class="btn btn-outline-secondary btn-sm rounded-pill px-4 auth-nav-btn">Register</a>
-                        </li>
-                        <li class="nav-item ms-lg-2">
-                            <a href="/admin/login" class="nav-link">Admin</a>
+                            <a href="/admin/login" class="btn btn-primary btn-sm rounded-pill px-4 auth-nav-btn">Admin Login</a>
                         </li>
                     </c:otherwise>
                 </c:choose>
@@ -99,19 +76,14 @@
                             <p class="small mb-3">${cake.description}</p>
 
                             <c:choose>
-                                <c:when test="${not empty sessionScope.user}">
-                                    <a href="#custom-request" class="btn btn-primary w-100">
-                                        <i class="fa-solid fa-cart-shopping me-2"></i> Buy Now
-                                    </a>
-                                </c:when>
                                 <c:when test="${not empty sessionScope.admin}">
                                     <a href="/admin/profile" class="btn btn-primary w-100">
                                         <i class="fa-solid fa-user-shield me-2"></i> Admin View
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="/login" class="btn btn-primary w-100">
-                                        <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Continue
+                                    <a href="/admin/login" class="btn btn-primary w-100">
+                                        <i class="fa-solid fa-right-to-bracket me-2"></i> Admin Login
                                     </a>
                                 </c:otherwise>
                             </c:choose>
@@ -126,10 +98,10 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h2>Custom Cake Request</h2>
-                <p class="mb-0 text-white-50">Have a specific design in mind? Share your theme, flavors, and tiers with us.</p>
+                <p class="mb-0 text-white-50">Sign in as admin to manage catalog and requests.</p>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="${not empty sessionScope.user ? '/profile' : '/register'}" class="btn btn-light btn-lg px-5 rounded-pill fw-bold">Start Request</a>
+                <a href="${not empty sessionScope.admin ? '/admin/profile' : '/admin/login'}" class="btn btn-light btn-lg px-5 rounded-pill fw-bold">Admin Access</a>
             </div>
         </div>
     </div>
