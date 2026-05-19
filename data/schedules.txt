@@ -1,0 +1,7 @@
+B104|Nimal Perera|12 Temple Road, Colombo 05|2026-06-18|10:30
+B105|Shehan Silva|44 Lake Drive, Kandy|2026-06-19|14:00
+B106|Rashmi Fernando|8 Beach Lane, Galle|2026-06-20|16:45
+C201|Dinithi Jayasuriya|21 Rose Avenue, Nugegoda|2026-06-21|11:15
+C202|Kavindu Wijesinghe|67 Palm Street, Matara|2026-06-22|13:30
+C206|Pasindu Rajapaksha|39 Hill Road, Nuwara Eliya|2026-06-25|10:00
+C208|Ayesh Peris|54 Sea View Road, Moratuwa|2026-06-26|11:00
