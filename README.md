@@ -10,6 +10,9 @@ Welcome to the BakeryWeb project! We have upgraded our architecture from a manua
 Before you do anything, make sure you have the latest architecture. Open your terminal in IntelliJ and run:
 `git pull origin main`
 
+### Java Version
+Use **JDK 17** for this project. Set IntelliJ Project SDK and `JAVA_HOME` to a JDK 17 installation before running Maven or Spring Boot.
+
 ### How to Start the Server
 ❌ **DO NOT** use the old Tomcat configuration.
 ✅ **DO THIS:** 1. In the project tree, go to `src/main/java/lk/sliit/it25/bakeryweb/`

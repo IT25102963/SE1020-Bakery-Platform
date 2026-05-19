@@ -1,6 +1,3 @@
-
-
-
 package lk.sliit.it25.bakeryweb.repository;
 
 import lk.sliit.it25.bakeryweb.model.Cake;

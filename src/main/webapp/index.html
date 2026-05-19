@@ -1,451 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Standard Cake Catalog</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard Cake Catalog | CakeForge Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        :root {
-          --cream:   #FDF6EC;
-          --brown:   #5C3D2E;
-          --gold:    #C9A96E;
-          --rose:    #E8A598;
-          --dark:    #2C1A0E;
-          --white:   #FFFFFF;
-          --shadow:  0 4px 24px rgba(92,61,46,0.12);
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.15rem;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-          font-family: 'Lato', sans-serif;
-          background: var(--cream);
-          color: var(--dark);
-          min-height: 100vh;
+        .catalog-card-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            min-height: 64px;
         }
 
-        /* ── HEADER ── */
-        header {
-          background: var(--brown);
-          color: var(--cream);
-          padding: 28px 40px;
-          display: flex;
-          align-items: center;
-          gap: 18px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-        }
-        header .logo { font-size: 2.2rem; }
-        header h1 {
-          font-family: 'Playfair Display', serif;
-          font-size: 2rem;
-          letter-spacing: 1px;
-        }
-        header p { font-size: 0.95rem; opacity: 0.75; margin-top: 2px; }
-
-        /* ── MAIN LAYOUT ── */
-        .container {
-          max-width: 1100px;
-          margin: 40px auto;
-          padding: 0 24px;
-          display: grid;
-          grid-template-columns: 340px 1fr;
-          gap: 32px;
-          align-items: start;
+        .catalog-empty {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 320px;
+            text-align: center;
         }
 
-        /* ── CARD ── */
-        .card {
-          background: var(--white);
-          border-radius: 16px;
-          padding: 28px;
-          box-shadow: var(--shadow);
-        }
-        .card h2 {
-          font-family: 'Playfair Display', serif;
-          font-size: 1.35rem;
-          color: var(--brown);
-          margin-bottom: 20px;
-          padding-bottom: 12px;
-          border-bottom: 2px solid var(--gold);
+        .catalog-empty i {
+            color: #ff6a88;
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
-        /* ── FORM ── */
-        .form-group { margin-bottom: 16px; }
-        label {
-          display: block;
-          font-size: 0.82rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.8px;
-          color: var(--brown);
-          margin-bottom: 6px;
-        }
-        input, select, textarea {
-          width: 100%;
-          padding: 10px 14px;
-          border: 1.5px solid #DDD;
-          border-radius: 8px;
-          font-family: 'Lato', sans-serif;
-          font-size: 0.95rem;
-          background: var(--cream);
-          color: var(--dark);
-          transition: border-color 0.2s;
-        }
-        input:focus, select:focus, textarea:focus {
-          outline: none;
-          border-color: var(--gold);
-        }
-        textarea { resize: vertical; min-height: 70px; }
-
-        .btn {
-          width: 100%;
-          padding: 12px;
-          border: none;
-          border-radius: 8px;
-          font-family: 'Lato', sans-serif;
-          font-size: 1rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          letter-spacing: 0.5px;
-        }
-        .btn-primary {
-          background: var(--brown);
-          color: var(--white);
-        }
-        .btn-primary:hover { background: var(--dark); transform: translateY(-1px); }
-
-        /* ── STATS BAR ── */
-        .stats-bar {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 20px;
-        }
-        .stat {
-          background: var(--white);
-          border-radius: 12px;
-          padding: 14px 20px;
-          flex: 1;
-          text-align: center;
-          box-shadow: var(--shadow);
-        }
-        .stat-num {
-          font-family: 'Playfair Display', serif;
-          font-size: 1.8rem;
-          color: var(--brown);
-          font-weight: 700;
-        }
-        .stat-label {
-          font-size: 0.78rem;
-          color: #888;
-          text-transform: uppercase;
-          letter-spacing: 0.7px;
+        .toast-panel {
+            background: var(--text-dark);
+            border-radius: 14px;
+            bottom: 24px;
+            box-shadow: var(--shadow-md);
+            color: #fff;
+            font-weight: 700;
+            opacity: 0;
+            padding: 1rem 1.25rem;
+            pointer-events: none;
+            position: fixed;
+            right: 24px;
+            transform: translateY(16px);
+            transition: all 0.25s ease;
+            z-index: 1200;
         }
 
-        /* ── CATALOG TABLE ── */
-        .catalog-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-        .catalog-header h2 {
-          font-family: 'Playfair Display', serif;
-          font-size: 1.35rem;
-          color: var(--brown);
+        .toast-panel.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
+        .toast-panel.error {
+            background: #d63031;
         }
-        thead tr {
-          background: var(--brown);
-          color: var(--cream);
-        }
-        th {
-          padding: 12px 16px;
-          text-align: left;
-          font-size: 0.82rem;
-          text-transform: uppercase;
-          letter-spacing: 0.8px;
-          font-weight: 700;
-        }
-        th:first-child { border-radius: 8px 0 0 0; }
-        th:last-child  { border-radius: 0 8px 0 0; }
 
-        tbody tr {
-          border-bottom: 1px solid #EEE;
-          transition: background 0.15s;
+        @media (max-width: 991.98px) {
+            .page-header h1 {
+                font-size: 2.6rem;
+            }
         }
-        tbody tr:hover { background: #FDF0E6; }
-        td { padding: 13px 16px; font-size: 0.93rem; }
 
-        .badge {
-          background: #FDF0E6;
-          color: var(--brown);
-          border: 1px solid var(--gold);
-          border-radius: 20px;
-          padding: 3px 10px;
-          font-size: 0.78rem;
-          font-weight: 700;
-        }
-        .price { font-weight: 700; color: var(--brown); }
+        @media (max-width: 575.98px) {
+            .page-header {
+                padding-top: 2.5rem;
+            }
 
-        .btn-delete {
-          background: transparent;
-          border: 1.5px solid var(--rose);
-          color: #c0392b;
-          border-radius: 6px;
-          padding: 5px 12px;
-          font-size: 0.82rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .btn-delete:hover { background: var(--rose); color: white; }
+            .page-header h1 {
+                font-size: 2.25rem;
+            }
 
-        .empty-state {
-          text-align: center;
-          padding: 50px 20px;
-          color: #AAA;
-        }
-        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-        .empty-state p { font-size: 1rem; }
-
-        /* ── TOAST ── */
-        .toast {
-          position: fixed;
-          bottom: 30px;
-          right: 30px;
-          background: var(--brown);
-          color: var(--white);
-          padding: 14px 22px;
-          border-radius: 10px;
-          font-size: 0.93rem;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-          opacity: 0;
-          transform: translateY(10px);
-          transition: all 0.3s;
-          z-index: 999;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { background: #c0392b; }
-
-        @media (max-width: 768px) {
-          .container { grid-template-columns: 1fr; }
+            .toast-panel {
+                left: 16px;
+                right: 16px;
+            }
         }
     </style>
 </head>
 <body>
-
-<header>
-    <span class="logo">🎂</span>
-    <div>
-        <h1>Standard Cake Catalog</h1>
-        <p>Manage your pre-made cake collection</p>
+<nav class="navbar navbar-expand-lg cake-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/catalog">
+            <img src="/theme/img/logo.png" alt="CakeForge" class="brand-logo">
+            <span>CakeForge</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link active" href="/catalog">Catalog</a></li>
+            </ul>
+        </div>
     </div>
+</nav>
+
+<header class="page-header container">
+    <h1>Cake Catalog</h1>
+    <p>Discover our artisanal creations, handcrafted with love and the finest ingredients.</p>
 </header>
 
-<div class="container">
-
-    <!-- LEFT: Add Cake Form -->
-    <div class="card">
-        <h2>➕ Add New Cake</h2>
-
-        <div class="form-group">
-            <label>Cake Name *</label>
-            <input type="text" id="cakeName" placeholder="e.g. Chocolate Truffle"/>
-        </div>
-
-        <div class="form-group">
-            <label>Category</label>
-            <select id="cakeCategory">
-                <option value="Birthday">Birthday</option>
-                <option value="Wedding">Wedding</option>
-                <option value="Anniversary">Anniversary</option>
-                <option value="Celebration">Celebration</option>
-                <option value="Seasonal">Seasonal</option>
-                <option value="Custom">Custom</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Price (LKR) *</label>
-            <input type="number" id="cakePrice" placeholder="e.g. 2500" min="0"/>
-        </div>
-
-        <div class="form-group">
-            <label>Description</label>
-            <textarea id="cakeDesc" placeholder="Describe the cake..."></textarea>
-        </div>
-
-        <button class="btn btn-primary" onclick="addCake()">🎂 Add to Catalog</button>
-    </div>
-
-    <!-- RIGHT: Catalog -->
-    <div>
-        <!-- Stats -->
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-num" id="totalCount">0</div>
-                <div class="stat-label">Total Cakes</div>
-            </div>
-            <div class="stat">
-                <div class="stat-num" id="avgPrice">0</div>
-                <div class="stat-label">Avg Price (LKR)</div>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="card" style="padding:0; overflow:hidden;">
-            <div style="padding:20px 24px 0;">
-                <div class="catalog-header">
-                    <h2>📋 Cake Catalog</h2>
-                </div>
-            </div>
-
-            <div id="catalogContainer">
-                <div class="empty-state">
-                    <div class="icon">🎂</div>
-                    <p>No cakes yet. Add your first cake!</p>
+<main class="container py-3">
+    <section class="row g-4 mb-4" aria-label="Catalog summary">
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon icon-pink"><i class="fa-solid fa-cake-candles"></i></div>
+                <div class="stat-info">
+                    <h3 id="totalCount">0</h3>
+                    <p>Total Cakes</p>
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon icon-blue"><i class="fa-solid fa-tags"></i></div>
+                <div class="stat-info">
+                    <h3 id="categoryCount">0</h3>
+                    <p>Categories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon icon-green"><i class="fa-solid fa-coins"></i></div>
+                <div class="stat-info">
+                    <h3 id="avgPrice">0</h3>
+                    <p>Avg Price (LKR)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="catalog-list">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center mb-3">
+            <div>
+                <h2 class="section-title">Cake Items</h2>
+                <p class="text-muted mb-0">Manage the standard cakes shown in the storefront.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                <a class="btn btn-primary" href="/add-cake">
+                    <i class="fa-solid fa-plus me-2"></i>Add Cake
+                </a>
+                <a class="btn btn-warning" href="#catalog-list">
+                    <i class="fa-solid fa-list-check me-2"></i>Manage
+                </a>
+            </div>
+        </div>
+        <div class="row g-4" id="catalogContainer">
+            <div class="col-12">
+                <div class="glass-card catalog-empty">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <h5 class="fw-bold">Loading catalog</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="custom-cake-req glass-card text-white mt-5">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2>Custom Cake Request</h2>
+                <p class="mb-0 text-white-50">Have a specific design in mind? Share your theme, flavors, and tiers with us.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/add-cake" class="btn btn-light btn-lg px-5 rounded-pill fw-bold">Start Request</a>
+            </div>
+        </div>
     </div>
-</div>
+</main>
 
-<div class="toast" id="toast"></div>
+<footer class="container py-5 text-center text-muted">
+    <p>&copy; 2026 CakeForge Studio. All rights reserved.</p>
+</footer>
 
+<div class="toast-panel" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const API = '/api/cakes';
+    const API = "/api/cakes";
+    const productImages = Array.from({ length: 12 }, (_, index) => `/theme/img/shop/product-${index + 1}.jpg`);
 
-    // ── Load all cakes on page load
-    window.onload = loadCakes;
+    document.addEventListener("DOMContentLoaded", function () {
+        loadCakes();
+    });
 
     async function loadCakes() {
-      try {
-        const res = await fetch(API);
-        const cakes = await res.json();
-        renderCatalog(cakes);
-        updateStats(cakes);
-      } catch (e) {
-        showToast('Failed to load cakes', true);
-      }
-    }
+        try {
+            const response = await fetch(API);
+            if (!response.ok) {
+                throw new Error("Unable to load catalog");
+            }
 
-    // ── Add Cake
-    async function addCake() {
-      const name     = document.getElementById('cakeName').value.trim();
-      const category = document.getElementById('cakeCategory').value;
-      const price    = document.getElementById('cakePrice').value;
-      const desc     = document.getElementById('cakeDesc').value.trim();
-
-      if (!name) { showToast('Please enter a cake name', true); return; }
-      if (!price || isNaN(price)) { showToast('Please enter a valid price', true); return; }
-
-      try {
-        const res = await fetch(API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, category, price, description: desc })
-        });
-        if (res.ok) {
-          showToast('✅ Cake added successfully!');
-          clearForm();
-          loadCakes();
-        } else {
-          const msg = await res.text();
-          showToast(msg || 'Error adding cake', true);
+            const cakes = await response.json();
+            renderCatalog(Array.isArray(cakes) ? cakes : []);
+            updateStats(Array.isArray(cakes) ? cakes : []);
+        } catch (error) {
+            renderCatalog([]);
+            showToast("Failed to load cakes", true);
         }
-      } catch (e) {
-        showToast('Connection error', true);
-      }
     }
 
-    // ── Delete Cake
     async function deleteCake(id) {
-      if (!confirm('Delete this cake from the catalog?')) return;
-      try {
-        const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          showToast('🗑️ Cake deleted');
-          loadCakes();
-        } else {
-          showToast('Error deleting cake', true);
+        if (!window.confirm("Delete this cake from the catalog?")) {
+            return;
         }
-      } catch (e) {
-        showToast('Connection error', true);
-      }
+
+        try {
+            const response = await fetch(`${API}/${encodeURIComponent(id)}`, { method: "DELETE" });
+            if (!response.ok) {
+                throw new Error("Error deleting cake");
+            }
+
+            showToast("Cake removed");
+            await loadCakes();
+        } catch (error) {
+            showToast(error.message || "Connection error", true);
+        }
     }
 
-    // ── Render Table
     function renderCatalog(cakes) {
-      const container = document.getElementById('catalogContainer');
-      if (!cakes.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="icon">🎂</div>
-            <p>No cakes yet. Add your first cake!</p>
-          </div>`;
-        return;
-      }
+        const container = document.getElementById("catalogContainer");
 
-      container.innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>#ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price (LKR)</th>
-              <th>Description</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${cakes.map(c => `
-              <tr>
-                <td><code style="font-size:0.78rem;color:#888">${c.id}</code></td>
-                <td><strong>${c.name}</strong></td>
-                <td><span class="badge">${c.category}</span></td>
-                <td class="price">${Number(c.price).toLocaleString()}</td>
-                <td style="color:#666;font-size:0.88rem">${c.description || '—'}</td>
-                <td>
-                  <button class="btn-delete" onclick="deleteCake('${c.id}')">🗑 Delete</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>`;
+        if (!cakes.length) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="glass-card catalog-empty">
+                        <i class="fa-solid fa-cake-candles"></i>
+                        <h5 class="fw-bold">No cakes yet</h5>
+                        <p class="text-muted mb-0">Add the first standard cake to publish it here.</p>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = cakes.map(function (cake, index) {
+            const image = productImages[index % productImages.length];
+            const name = escapeHtml(cake.name || "Untitled Cake");
+            const category = escapeHtml(cake.category || "Uncategorized");
+            const description = escapeHtml(cake.description || "Freshly prepared CakeForge standard cake.");
+            const id = escapeHtml(cake.id || "");
+
+            return `
+                <div class="col-sm-6 col-lg-3">
+                    <article class="product-card catalog-product-card">
+                        <img src="${image}" alt="${name}">
+                        <div class="product-card-body d-flex flex-column">
+                            <h6>${name}</h6>
+                            <p class="product-price">LKR ${formatPrice(cake.price)}</p>
+                            <p class="small text-muted mb-3">${category}</p>
+                            <p class="small mb-3 catalog-card-text">${description}</p>
+                            <button class="btn btn-outline-danger w-100 mt-auto js-delete-cake" type="button" data-id="${id}">
+                                <i class="fa-solid fa-trash me-2"></i>Delete
+                            </button>
+                        </div>
+                    </article>
+                </div>`;
+        }).join("");
+
+        container.querySelectorAll(".js-delete-cake").forEach(function (button) {
+            button.addEventListener("click", function () {
+                deleteCake(button.getAttribute("data-id"));
+            });
+        });
     }
 
-    // ── Update Stats
     function updateStats(cakes) {
-      document.getElementById('totalCount').textContent = cakes.length;
-      const avg = cakes.length
-        ? Math.round(cakes.reduce((s, c) => s + c.price, 0) / cakes.length)
-        : 0;
-      document.getElementById('avgPrice').textContent = avg.toLocaleString();
+        const total = cakes.length;
+        const categories = new Set(cakes.map(function (cake) {
+            return cake.category || "Uncategorized";
+        }));
+        const totalPrice = cakes.reduce(function (sum, cake) {
+            const price = Number(cake.price);
+            return sum + (Number.isFinite(price) ? price : 0);
+        }, 0);
+
+        document.getElementById("totalCount").textContent = total;
+        document.getElementById("categoryCount").textContent = total ? categories.size : 0;
+        document.getElementById("avgPrice").textContent = total ? Math.round(totalPrice / total).toLocaleString() : "0";
     }
 
-    // ── Clear Form
-    function clearForm() {
-      document.getElementById('cakeName').value  = '';
-      document.getElementById('cakePrice').value = '';
-      document.getElementById('cakeDesc').value  = '';
-      document.getElementById('cakeCategory').selectedIndex = 0;
+    function formatPrice(value) {
+        const price = Number(value);
+        if (!Number.isFinite(price)) {
+            return "0.00";
+        }
+
+        return price.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 
-    // ── Toast
-    function showToast(msg, isError = false) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast show' + (isError ? ' error' : '');
-      setTimeout(() => { t.className = 'toast'; }, 3000);
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[character];
+        });
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast-panel show" + (isError ? " error" : "");
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(function () {
+            toast.className = "toast-panel";
+        }, 3000);
     }
 </script>
-
 </body>
 </html>
