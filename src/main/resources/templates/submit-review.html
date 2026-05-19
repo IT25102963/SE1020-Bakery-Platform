@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write Review | CakeForge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg cake-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/catalog}">
+            <img th:src="@{/theme/img/logo.png}" alt="CakeForge" class="brand-logo">
+            <span>CakeForge</span>
+        </a>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/catalog}">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/reviews/new}">Write Review</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/reviews/manage}">My Reviews</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/reviews/testimonials}">Read Reviews</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="page-header container">
+    <h1>Share Your Experience</h1>
+    <p>Tell other customers what you ordered and how it was.</p>
+</header>
+
+<main class="container py-4">
+    <div th:if="${successMsg}" class="alert alert-success glass-card border-0" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger glass-card border-0" th:text="${errorMsg}"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="glass-card">
+                <h5 class="fw-bold mb-4">Write Review</h5>
+                <form th:action="@{/reviews/new}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" name="customerName" class="form-control"
+                               th:value="${currentUserName}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cake Name</label>
+                        <input type="text" name="cakeName" class="form-control" maxlength="100" required placeholder="e.g. Chocolate Truffle">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <select class="form-select" name="rating" required>
+                            <option value="">Select rating</option>
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="3">3 - Good</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Comment</label>
+                        <textarea class="form-control" name="comment" rows="5" maxlength="500" required placeholder="Share your honest feedback"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="glass-card h-100">
+                <h5 class="fw-bold mb-3">Review Panel</h5>
+                <p class="text-muted">Use these options to read customer feedback and manage your reviews.</p>
+                <div class="d-grid gap-2">
+                    <a th:href="@{/reviews/testimonials}" class="btn btn-outline-secondary rounded-pill">
+                        <i class="fa-solid fa-comments me-2"></i>Read Users Reviews
+                    </a>
+                    <a th:href="@{/reviews/manage}" class="btn btn-light border rounded-pill">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>My Reviews
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

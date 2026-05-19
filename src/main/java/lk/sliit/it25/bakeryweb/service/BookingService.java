@@ -1,0 +1,144 @@
+package lk.sliit.it25.bakeryweb.service;
+
+import lk.sliit.it25.bakeryweb.model.Booking;
+import lk.sliit.it25.bakeryweb.repository.BookingFileRepository;
+import lk.sliit.it25.bakeryweb.util.BookingIdGenerator;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+@Service
+public class BookingService {
+
+    private final BookingFileRepository repository;
+    private final BookingIdGenerator idGenerator;
+
+    public BookingService(BookingFileRepository repository, BookingIdGenerator idGenerator) {
+        this.repository = repository;
+        this.idGenerator = idGenerator;
+    }
+
+    public Booking createBooking(Booking booking) {
+        // Generate an ID that doesn't collide with existing bookings
+        booking.setBookingId(idGenerator.generateFromExisting(repository.findAll()));
+        repository.save(booking);
+        return booking;
+    }
+
+    public List<Booking> getAllBookings() {
+        return repository.findAll();
+    }
+
+    public Optional<Booking> getBookingById(String id) {
+        return repository.findById(id);
+    }
+
+    public boolean updateBooking(String id, Booking updated) {
+        return repository.update(id, updated);
+    }
+
+    public boolean deleteBooking(String id) {
+        return repository.delete(id);
+    }
+
+    public boolean cancelBooking(String id) {
+        return repository.cancel(id);
+    }
+
+    public boolean updateStatus(String id, String status) {
+        String normalizedStatus = normalizeStatus(status);
+        if (normalizedStatus == null) {
+            return false;
+        }
+        return repository.updateStatus(id, normalizedStatus);
+    }
+
+    public List<String> getOrderTypes() {
+        return Arrays.asList("Standard", "Custom");
+    }
+
+    public List<String> getStatuses() {
+        return Arrays.asList("Pending", "Confirmed", "Completed", "Ready for Delivery", "Delivered", "Cancelled", "Delete Requested");
+    }
+
+    public Map<String, BigDecimal> getCakePrices() {
+        Map<String, BigDecimal> prices = new LinkedHashMap<>();
+        // Catalog names (single source)
+        prices.put("Creamy Strawberry", new BigDecimal("2200.00"));
+        prices.put("Classic Tiramisu", new BigDecimal("1800.00"));
+        prices.put("Fruit Fiesta Tart", new BigDecimal("2500.00"));
+        prices.put("Raspberry Choco", new BigDecimal("2700.00"));
+        // Legacy / booking template aliases
+        prices.put("Creamy Strawberry Cake", new BigDecimal("2200.00"));
+        prices.put("Classic Tiramisu Slice", new BigDecimal("1800.00"));
+        prices.put("Raspberry Choco Tart", new BigDecimal("2700.00"));
+        // Keep older product names (if referenced elsewhere)
+        prices.put("Chocolate Truffle", new BigDecimal("4500.00"));
+        prices.put("Vanilla Dream", new BigDecimal("4000.00"));
+        prices.put("Red Velvet", new BigDecimal("4800.00"));
+        return prices;
+    }
+
+    public BigDecimal findCakePrice(String cakeName) {
+        if (cakeName == null || cakeName.isBlank()) {
+            return BigDecimal.ZERO;
+        }
+        String requested = cakeName.trim();
+        for (Map.Entry<String, BigDecimal> entry : getCakePrices().entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(requested)) {
+                return entry.getValue();
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal calculateTotalPrice(String cakeName, Integer quantity) {
+        BigDecimal unit = findCakePrice(cakeName);
+        return unit.multiply(new BigDecimal(quantity));
+    }
+    public long countByStatus(String status) {
+        return getAllBookings().stream()
+                .filter(b -> status != null && status.equalsIgnoreCase(b.getStatus()))
+                .count();
+    }
+
+    public long getPendingCount() {
+        return countByStatus("Pending");
+    }
+
+    public long getReadyForDeliveryCount() {
+        return getAllBookings().stream()
+                .filter(this::isReadyForDelivery)
+                .count();
+    }
+
+    private boolean isReadyForDelivery(Booking booking) {
+        if (booking == null || booking.getStatus() == null) {
+            return false;
+        }
+
+        String normalizedStatus = booking.getStatus().trim().toLowerCase(Locale.ROOT);
+        return "ready for delivery".equals(normalizedStatus)
+                || "ready".equals(normalizedStatus)
+                || "confirmed".equals(normalizedStatus);
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null) {
+            return null;
+        }
+        String normalized = status.trim().toLowerCase(Locale.ROOT);
+        return switch (normalized) {
+            case "pending" -> "Pending";
+            case "confirmed" -> "Confirmed";
+            case "completed", "complete" -> "Completed";
+            case "ready for delivery", "ready" -> "Ready for Delivery";
+            case "delivered" -> "Delivered";
+            case "cancelled", "canceled" -> "Cancelled";
+            case "delete requested", "delete-requested", "delete_requested" -> "Delete Requested";
+            default -> null;
+        };
+    }
+
+}

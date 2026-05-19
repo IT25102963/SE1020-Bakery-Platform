@@ -1,46 +1,69 @@
-# 🥐 BakeryWeb Platform - Developer Guide
+# Order & Bookings Management System
 
-Welcome to the BakeryWeb project! We have upgraded our architecture from a manual Tomcat server to a modern **Spring Boot** engine. This makes routing, security, and running the application much easier.
+Spring Boot CRUD web application module for a Bakery System to manage only Order & Bookings.
 
-**IMPORTANT:** Please read this guide completely before writing any new code to avoid breaking the application.
+## Tech Stack
 
----
+- Java 17
+- Spring Boot 3.5.13
+- Maven
+- Thymeleaf
+- Bean Validation
+- Text-file data storage (CSV in `bookings.txt`)
 
-## 🚀 Step 1: Getting Started
-Before you do anything, make sure you have the latest architecture. Open your terminal in IntelliJ and run:
-`git pull origin main`
+## Package
 
-### How to Start the Server
-❌ **DO NOT** use the old Tomcat configuration.
-✅ **DO THIS:** 1. In the project tree, go to `src/main/java/lk/sliit/it25/bakeryweb/`
-2. Right-click **`BakerywebApplication.java`**
-3. Click **▶️ Run 'BakerywebApplication.main()'**
-4. Wait for the large "SPRING" logo to appear in the terminal.
-5. Open your browser and go to `http://localhost:8080/`
+`lk.sliit.it25.bakeryweb`
 
----
+## Features
 
-## 📁 Step 2: The New Folder Structure
-Spring Boot is strict about where files live. Please stick to your assigned module folders!
+- Create Booking
+- View All Bookings
+- View Single Booking Receipt by ID
+- Search Booking by ID
+- Edit Booking Details
+- Update Booking Status
+- Delete Booking
+- Cancel Booking (status -> Cancelled)
 
-* **Frontend UI (`.jsp` files):** `src/main/webapp/WEB-INF/jsp/[your-module]/`
-  *(Note: Files must go in WEB-INF/jsp/ so Spring Boot can secure them!)*
-* **Backend Brains (`.java` files):** `src/main/java/lk/sliit/it25/bakeryweb/[your-module]/`
-* **Text File Database (`.txt` files):** `/data/` (At the root of the project).
+## Booking Data File
 
----
+All booking records are stored in:
 
-## 🛠️ Step 3: How to Create a New Web Page
-If you want to create a new page (for example, an Add Cake page for the Catalog), follow this 2-step workflow:
+`src/main/resources/data/bookings.txt`
 
-**1. Create the JSP File:**
-Create your `addCake.jsp` file inside `WEB-INF/jsp/catalog/`.
+Each booking is one CSV line:
 
-**2. Route it in your Controller:**
-Open your `CatalogController.java` and tell Spring Boot how to find it:
-```java
-@GetMapping("/add-cake")
-public String showAddCakePage() {
-    // This automatically looks inside WEB-INF/jsp/ and adds .jsp
-    return "catalog/addCake"; 
-}
+`bookingId,customerName,phone,cakeName,orderType,quantity,bookingDate,deliveryDate,totalPrice,status`
+
+Example:
+
+`B001,Lakshitha,0771234567,Chocolate Truffle,Standard,1,2026-03-27,2026-03-30,4500.00,Pending`
+
+## Routes
+
+- `/bookings`
+- `/bookings/new`
+- `/bookings/save`
+- `/bookings/search`
+- `/bookings/receipt/{id}`
+- `/bookings/edit/{id}`
+- `/bookings/update/{id}`
+- `/bookings/status/{id}`
+- `/bookings/delete/{id}`
+- `/bookings/cancel/{id}`
+
+## Run Instructions
+
+1. Ensure Java 17 is installed.
+2. Open project in IntelliJ IDEA or VS Code.
+3. Run the app:
+   - macOS/Linux: `./mvnw spring-boot:run`
+   - Windows: `mvnw.cmd spring-boot:run`
+4. Open browser:
+   - `http://localhost:8080/bookings`
+
+## Notes
+
+- No JPA, Hibernate, SQL, or MySQL is used.
+- Application follows MVC architecture with Controller, Service, Repository, Model, and Utility layers.
