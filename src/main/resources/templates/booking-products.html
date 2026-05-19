@@ -11,7 +11,7 @@
 <body>
 <nav class="navbar navbar-expand-lg cake-navbar">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/bookings/products}">
+        <a class="navbar-brand" th:href="@{/catalog}">
             <img th:src="@{/theme/img/logo.png}" alt="CakeForge" class="brand-logo">
             <span>CakeForge</span>
         </a>
@@ -20,10 +20,10 @@
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/products}">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/catalog}">Catalog</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/bookings/my-orders}">Bookings</a></li>
                 <li class="nav-item ms-lg-3">
-                    <a th:href="@{/bookings/cart}" class="nav-link cart-icon-wrapper">
+                    <a th:href="@{/bookings/checkout}" class="nav-link cart-icon-wrapper">
                         <i class="fa-solid fa-cart-shopping fa-lg"></i>
                         <span class="cart-badge" th:text="${cartCount}">0</span>
                     </a>

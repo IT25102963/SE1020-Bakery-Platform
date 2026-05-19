@@ -56,6 +56,9 @@ public class CartService {
 
         item.setCakeName(cakeName);
         item.setQuantity(quantityToAdd);
+        if (item.getUnitPrice() == null) {
+            item.setUnitPrice(BigDecimal.ZERO);
+        }
         cart.add(item);
     }
 
@@ -102,11 +105,17 @@ public class CartService {
             if (existing == null) {
                 item.setCakeName(item.getCakeName().trim());
                 item.setQuantity(sanitizeQuantity(item.getQuantity()));
+                if (item.getUnitPrice() == null) {
+                    item.setUnitPrice(BigDecimal.ZERO);
+                }
                 merged.put(key, item);
             } else {
                 existing.setQuantity(sanitizeQuantity(existing.getQuantity()) + sanitizeQuantity(item.getQuantity()));
                 if (existing.getUnitPrice() == null) {
                     existing.setUnitPrice(item.getUnitPrice());
+                }
+                if (existing.getUnitPrice() == null) {
+                    existing.setUnitPrice(BigDecimal.ZERO);
                 }
             }
         }

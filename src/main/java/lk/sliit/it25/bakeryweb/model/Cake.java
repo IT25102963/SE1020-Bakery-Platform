@@ -6,15 +6,21 @@ public class Cake {
     private String description;
     private double price;
     private String category;
+    private String imageUrl;
 
     public Cake() {}
 
     public Cake(String id, String name, String description, double price, String category) {
+        this(id, name, description, price, category, "");
+    }
+
+    public Cake(String id, String name, String description, double price, String category, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.category = category;
+        this.imageUrl = imageUrl == null ? "" : imageUrl;
     }
 
     public Cake(int id, String name, double price, String category, String description) {
@@ -37,8 +43,11 @@ public class Cake {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl == null ? "" : imageUrl; }
+
     @Override
     public String toString() {
-        return id + "|" + name + "|" + description + "|" + price + "|" + category;
+        return id + "|" + name + "|" + description + "|" + price + "|" + category + "|" + imageUrl;
     }
 }

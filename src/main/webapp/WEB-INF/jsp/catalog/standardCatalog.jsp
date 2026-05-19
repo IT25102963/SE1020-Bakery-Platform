@@ -15,11 +15,14 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="m-0">Standard Cake Catalog (Manage)</h2>
         <div class="d-flex gap-2">
-            <a href="/catalog" class="btn btn-primary btn-sm rounded-pill px-3">
-                <i class="fa-solid fa-store me-1"></i> Customer Catalog
+            <a href="/admin/profile" class="btn btn-primary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-user-shield me-1"></i> Admin Profile
             </a>
-            <a href="/delivery" class="btn btn-warning btn-sm rounded-pill px-3 text-white">
-                <i class="fa-solid fa-truck me-1"></i> Delivery
+            <a href="/bookings/my-orders" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-clipboard-list me-1"></i> Orders
+            </a>
+            <a href="/catalog" class="btn btn-warning btn-sm rounded-pill px-3 text-white">
+                <i class="fa-solid fa-store me-1"></i> Customer Catalog
             </a>
         </div>
     </div>
@@ -35,18 +38,14 @@
         <div class="col-lg-4">
             <div class="glass-card">
                 <h5 class="fw-bold mb-3">Add Cake</h5>
-                <form action="/standard-catalog/add" method="post">
+                <form action="/standard-catalog/add" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="form-label">Name</label>
                         <input class="form-control" type="text" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Flavor</label>
-                        <input class="form-control" type="text" name="flavor">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Size</label>
-                        <input class="form-control" type="text" name="size">
+                        <label class="form-label">Category</label>
+                        <input class="form-control" type="text" name="category" placeholder="Signature Cakes">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Price (LKR)</label>
@@ -55,6 +54,10 @@
                     <div class="mb-3">
                         <label class="form-label">Description</label>
                         <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cake Image</label>
+                        <input class="form-control" type="file" name="cakeImage" accept="image/*">
                     </div>
                     <button class="btn btn-primary w-100" type="submit">Add to Catalog</button>
                 </form>
@@ -69,10 +72,10 @@
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Flavor</th>
-                            <th>Size</th>
+                            <th>Category</th>
                             <th>Price</th>
                             <th>Description</th>
+                            <th>Image</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -80,15 +83,27 @@
                         <c:forEach items="${cakes}" var="c">
                             <tr>
                                 <td>${c.name}</td>
-                                <td>${c.flavor}</td>
-                                <td>${c.size}</td>
+                                <td>${c.category}</td>
                                 <td>${c.price}</td>
                                 <td>${c.description}</td>
                                 <td>
-                                    <form action="/standard-catalog/delete" method="post">
-                                        <input type="hidden" name="id" value="${c.id}">
-                                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                                    </form>
+                                    <c:choose>
+                                        <c:when test="${not empty c.imageUrl}">
+                                            <img src="${c.imageUrl}" alt="${c.name}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted small">No image</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-2">
+                                        <a href="/standard-catalog/edit?id=${c.id}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                        <form action="/standard-catalog/delete" method="post">
+                                            <input type="hidden" name="id" value="${c.id}">
+                                            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>

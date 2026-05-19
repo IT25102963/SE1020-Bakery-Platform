@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,20 +17,33 @@
             <i class="fa-solid fa-cake-candles me-2"></i><span>CakeForge</span>
         </a>
         <div class="ms-auto d-flex gap-2">
-            <a href="/catalog" class="btn btn-outline-dark nav-action-btn">Back to Catalog</a>
+            <a href="/standard-catalog" class="btn btn-warning text-white nav-action-btn">Manage Cakes</a>
+            <a href="/bookings/my-orders" class="btn btn-outline-dark nav-action-btn">Orders Dashboard</a>
             <a href="/logout" class="btn btn-dark nav-action-btn">Logout</a>
         </div>
     </div>
 </nav>
 
 <main class="auth-page container py-5">
+    <c:if test="${not empty success}">
+        <div class="alert alert-success">${success}</div>
+    </c:if>
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8">
             <div class="glass-card auth-card">
-                <h2 class="text-center mb-4">Admin Profile</h2>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="m-0">Admin Profile</h2>
+                    <a href="/admin/editProfile" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                    </a>
+                </div>
                 <div class="profile-row"><span>Name</span><strong>${admin.name}</strong></div>
                 <div class="profile-row"><span>Email</span><strong>${admin.email}</strong></div>
                 <div class="profile-row"><span>Role</span><strong>Administrator</strong></div>
+                <div class="d-flex gap-2 mt-4">
+                    <a href="/standard-catalog" class="btn btn-warning text-white w-100">Manage Cake Catalog</a>
+                    <a href="/bookings/my-orders" class="btn btn-outline-secondary w-100">Manage Orders</a>
+                </div>
             </div>
         </div>
     </div>

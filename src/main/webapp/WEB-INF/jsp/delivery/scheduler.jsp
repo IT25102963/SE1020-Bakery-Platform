@@ -1,7 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="lk.sliit.it25.bakeryweb.model.Booking" %>
 <%@ page import="lk.sliit.it25.bakeryweb.model.DeliverySlot" %>
+<%@ page import="lk.sliit.it25.bakeryweb.customrequests.CustomRequest" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +14,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        .slot-form-actions {
-            white-space: nowrap;
-        }
-        .slot-form-actions form {
-            display: inline;
-        }
         .roster-card {
             border-radius: 20px;
             overflow: hidden;
@@ -30,6 +26,9 @@
         .roster-card .table tbody td {
             border-top: 1px solid #e9ecef;
         }
+        .slot-form-actions {
+            white-space: nowrap;
+        }
         .slot-form-actions .btn-action {
             width: 38px;
             height: 38px;
@@ -40,10 +39,21 @@
             justify-content: center;
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
-        .slot-form-actions .btn-action i { color: inherit !important; }
-        .slot-form-actions .btn-receipt { background: #efe9ff; color: #7c4dff !important; }
-        .slot-form-actions .btn-edit { background: #e6f4ff; color: #42a5f5 !important; }
-        .slot-form-actions .btn-delete { background: #fdecef; color: #ef5350 !important; border: 0; }
+        .slot-form-actions .btn-action i {
+            color: inherit !important;
+        }
+        .slot-form-actions .btn-receipt {
+            background: #efe9ff;
+            color: #7c4dff !important;
+        }
+        .slot-form-actions .btn-edit {
+            background: #e6f4ff;
+            color: #42a5f5 !important;
+        }
+        .slot-form-actions .btn-status {
+            background: #fff3dd;
+            color: #e59b00 !important;
+        }
         .badge-status {
             padding: 0.42rem 1rem;
             border-radius: 999px;
@@ -57,9 +67,6 @@
         .status-completed {
             background: #d9f7e8;
             color: #1f8f5f;
-        }
-        .search-fake {
-            background: #f8f9fa;
         }
         .brand-logo {
             height: 34px;
@@ -79,7 +86,9 @@
             font-weight: 800;
             font-size: 2.2rem;
         }
-        .cake-navbar .navbar-brand span { color: #ef6b9a !important; }
+        .cake-navbar .navbar-brand span {
+            color: #ef6b9a !important;
+        }
         .stat-card {
             background: rgba(255, 255, 255, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -121,47 +130,53 @@
 <body>
 <nav class="navbar navbar-expand-lg cake-navbar">
     <div class="container">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}/bookings/products">
-            <img src="${pageContext.request.contextPath}/img/cake-brand.png" alt="CakeForge" class="brand-logo">
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/catalog">
+            <img src="${pageContext.request.contextPath}/theme/img/logo.png" alt="CakeForge" class="brand-logo">
             <span>CakeForge</span>
         </a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/products">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/catalog">Catalog</a></li>
                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/my-orders">Bookings</a></li>
                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/delivery">Delivery</a></li>
             </ul>
         </div>
     </div>
 </nav>
+
 <div class="container py-4">
     <%
-        List<DeliverySlot> slots = (List<DeliverySlot>) request.getAttribute("slots");
-        int totalSlots = (slots == null) ? 0 : slots.size();
+        List<Booking> catalogOrders = (List<Booking>) request.getAttribute("catalogOrders");
+        List<CustomRequest> customRequests = (List<CustomRequest>) request.getAttribute("customRequests");
+        Map<String, DeliverySlot> deliverySlotMap = (Map<String, DeliverySlot>) request.getAttribute("deliverySlotMap");
+        Map<String, String> customSlotIdMap = (Map<String, String>) request.getAttribute("customSlotIdMap");
+
+        int totalSlots = (catalogOrders == null ? 0 : catalogOrders.size()) + (customRequests == null ? 0 : customRequests.size());
         int completedSlots = 0;
-        if (slots != null) {
-            for (DeliverySlot slot : slots) {
-                String id = slot.getId() == null ? "" : slot.getId().toUpperCase();
-                if (id.equals("B104") || id.equals("B105") || id.equals("B106")
-                        || id.equals("C201") || id.equals("C202") || id.equals("C203")) {
+
+        if (catalogOrders != null) {
+            for (Booking order : catalogOrders) {
+                String status = order.getStatus() == null ? "" : order.getStatus().trim().toLowerCase();
+                if (status.equals("completed") || status.equals("delivered")) {
                     completedSlots++;
                 }
             }
         }
-        List<DeliverySlot> customSlots = new ArrayList<>();
-        if (slots != null) {
-            for (DeliverySlot slot : slots) {
-                if (slot.getId() != null && slot.getId().toUpperCase().startsWith("C")) {
-                    customSlots.add(slot);
+        if (customRequests != null) {
+            for (CustomRequest customRequest : customRequests) {
+                String status = customRequest.getStatus() == null ? "" : customRequest.getStatus().trim().toLowerCase();
+                if (status.equals("completed")) {
+                    completedSlots++;
                 }
             }
         }
     %>
+
     <header class="page-header container">
         <div class="d-flex justify-content-between align-items-end">
             <div>
-                <h1>Dashboard</h1>
-                <p>Manage delivery slots and route operations.</p>
+                <h1>Delivery Management</h1>
+                <p>Schedule delivery date/time and update order status.</p>
             </div>
         </div>
     </header>
@@ -190,11 +205,7 @@
         <div class="col-lg-12">
             <div class="glass-card p-0 overflow-hidden roster-card">
                 <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">Recent Orders</h5>
-                    <div class="input-group w-25">
-                        <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0 search-fake" placeholder="Search orders..." disabled>
-                    </div>
+                    <h5 class="mb-0 fw-bold">Catalog Orders</h5>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
@@ -202,36 +213,44 @@
                         <tr>
                             <th>Booking ID</th>
                             <th>Customer</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Time</th>
+                            <th>Cake</th>
+                            <th>Delivery Date</th>
+                            <th>Delivery Time</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <%
-                            if (slots != null && !slots.isEmpty()) {
-                                for (DeliverySlot slot : slots) {
+                            if (catalogOrders != null && !catalogOrders.isEmpty()) {
+                                for (Booking order : catalogOrders) {
+                                    String orderStatus = (order.getStatus() == null || order.getStatus().isBlank()) ? "Pending" : order.getStatus();
+                                    String normalizedOrderStatus = orderStatus.trim().toLowerCase();
+                                    String statusClass = (normalizedOrderStatus.equals("completed") || normalizedOrderStatus.equals("delivered"))
+                                            ? "status-completed"
+                                            : "status-pending";
+
+                                    String slotKey = order.getBookingId() == null ? "" : order.getBookingId().trim().toUpperCase();
+                                    DeliverySlot slot = deliverySlotMap == null ? null : deliverySlotMap.get(slotKey);
+
+                                    String deliveryDateDisplay = (slot != null && slot.getDeliveryDate() != null && !slot.getDeliveryDate().isBlank())
+                                            ? slot.getDeliveryDate()
+                                            : (order.getDeliveryDate() == null ? "-" : order.getDeliveryDate().toString());
+                                    String deliveryTimeDisplay = (slot != null && slot.getDeliveryTime() != null && !slot.getDeliveryTime().isBlank())
+                                            ? slot.getDeliveryTime()
+                                            : "Not set";
                         %>
                         <tr>
-                            <td><span class="badge bg-light text-dark border"><%= slot.getId() %></span></td>
-                            <td><%= slot.getCustomerName() %></td>
-                            <td><%= slot.getAddress() %></td>
-                            <td><%= slot.getDeliveryDate() %></td>
-                            <td><%= (slot.getDeliveryTime() == null || slot.getDeliveryTime().isBlank()) ? "Not set" : slot.getDeliveryTime() %></td>
-                            <%
-                                String recentId = slot.getId() == null ? "" : slot.getId().toUpperCase();
-                                boolean recentCompleted = recentId.equals("B104") || recentId.equals("B105") || recentId.equals("B106");
-                            %>
-                            <td><span class="badge-status <%= recentCompleted ? "status-completed" : "status-pending" %>"><%= recentCompleted ? "Completed" : "Pending" %></span></td>
+                            <td><span class="badge bg-light text-dark border"><%= order.getBookingId() %></span></td>
+                            <td><%= order.getCustomerName() %></td>
+                            <td><%= order.getCakeName() %></td>
+                            <td><%= deliveryDateDisplay %></td>
+                            <td><%= deliveryTimeDisplay %></td>
+                            <td><span class="badge-status <%= statusClass %>"><%= orderStatus %></span></td>
                             <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=<%= slot.getId() %>"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= slot.getId() %>"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="<%= slot.getId() %>" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
+                                <a class="btn-action btn-receipt" title="View Receipt" href="${pageContext.request.contextPath}/bookings/receipt/<%= order.getBookingId() %>"><i class="fa-solid fa-receipt"></i></a>
+                                <a class="btn-action btn-edit" title="Schedule Delivery" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= order.getBookingId() %>"><i class="fa-solid fa-clock"></i></a>
+                                <a class="btn-action btn-status" title="Change Status" href="${pageContext.request.contextPath}/bookings/status/<%= order.getBookingId() %>"><i class="fa-solid fa-gear"></i></a>
                             </td>
                         </tr>
                         <%
@@ -239,52 +258,7 @@
                             } else {
                         %>
                         <tr>
-                            <td><span class="badge bg-light text-dark border">B104</span></td>
-                            <td>Nimal Perera</td>
-                            <td>12 Temple Road, Colombo 05</td>
-                            <td>2026-06-18</td>
-                            <td>10:30</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=B104"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=B104"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="B104" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-light text-dark border">B105</span></td>
-                            <td>Shehan Silva</td>
-                            <td>44 Lake Drive, Kandy</td>
-                            <td>2026-06-19</td>
-                            <td>14:00</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=B105"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=B105"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="B105" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-light text-dark border">B106</span></td>
-                            <td>Rashmi Fernando</td>
-                            <td>8 Beach Lane, Galle</td>
-                            <td>2026-06-20</td>
-                            <td>16:45</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=B106"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=B106"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="B106" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
+                            <td colspan="7" class="text-center py-4 text-muted">No catalog orders found.</td>
                         </tr>
                         <%
                             }
@@ -294,51 +268,64 @@
                 </div>
             </div>
         </div>
+
         <div class="col-lg-12">
             <div class="glass-card p-0 overflow-hidden roster-card">
                 <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">Custom Cake Orders</h5>
-                    <div class="input-group w-25">
-                        <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0 search-fake" placeholder="Search custom orders..." disabled>
-                    </div>
+                    <h5 class="mb-0 fw-bold">Custom Cake Order Management</h5>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead>
                         <tr>
-                            <th>Schedule ID</th>
+                            <th>Request ID</th>
                             <th>Customer</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Time</th>
+                            <th>Tiers</th>
+                            <th>Theme</th>
+                            <th>Delivery Date</th>
+                            <th>Delivery Time</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <%
-                            if (!customSlots.isEmpty()) {
-                                for (DeliverySlot slot : customSlots) {
+                            if (customRequests != null && !customRequests.isEmpty()) {
+                                for (CustomRequest customRequest : customRequests) {
+                                    String customStatus = (customRequest.getStatus() == null || customRequest.getStatus().isBlank())
+                                            ? "Pending"
+                                            : customRequest.getStatus();
+                                    String normalizedCustomStatus = customStatus.trim().toLowerCase();
+                                    String customStatusClass = normalizedCustomStatus.equals("completed")
+                                            ? "status-completed"
+                                            : "status-pending";
+
+                                    String requestId = customRequest.getRequestId() == null ? "" : customRequest.getRequestId();
+                                    String customSlotId = customSlotIdMap == null ? requestId : customSlotIdMap.get(requestId);
+                                    if (customSlotId == null || customSlotId.isBlank()) {
+                                        customSlotId = requestId;
+                                    }
+
+                                    DeliverySlot customSlot = deliverySlotMap == null ? null : deliverySlotMap.get(customSlotId.trim().toUpperCase());
+                                    String customDateDisplay = (customSlot != null && customSlot.getDeliveryDate() != null && !customSlot.getDeliveryDate().isBlank())
+                                            ? customSlot.getDeliveryDate()
+                                            : "Not scheduled";
+                                    String customTimeDisplay = (customSlot != null && customSlot.getDeliveryTime() != null && !customSlot.getDeliveryTime().isBlank())
+                                            ? customSlot.getDeliveryTime()
+                                            : "Not set";
                         %>
                         <tr>
-                            <td><span class="badge bg-light text-dark border"><%= slot.getId() %></span></td>
-                            <td><%= slot.getCustomerName() %></td>
-                            <td><%= slot.getAddress() %></td>
-                            <td><%= slot.getDeliveryDate() %></td>
-                            <td><%= (slot.getDeliveryTime() == null || slot.getDeliveryTime().isBlank()) ? "Not set" : slot.getDeliveryTime() %></td>
-                            <%
-                                String customId = slot.getId() == null ? "" : slot.getId().toUpperCase();
-                                boolean customCompleted = customId.equals("C201") || customId.equals("C202") || customId.equals("C203");
-                            %>
-                            <td><span class="badge-status <%= customCompleted ? "status-completed" : "status-pending" %>"><%= customCompleted ? "Completed" : "Pending" %></span></td>
+                            <td><span class="badge bg-light text-dark border"><%= customRequest.getRequestId() %></span></td>
+                            <td><%= customRequest.getCustomerName() %></td>
+                            <td><%= customRequest.getTiers() %></td>
+                            <td><%= customRequest.getTheme() %></td>
+                            <td><%= customDateDisplay %></td>
+                            <td><%= customTimeDisplay %></td>
+                            <td><span class="badge-status <%= customStatusClass %>"><%= customStatus %></span></td>
                             <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=<%= slot.getId() %>"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= slot.getId() %>"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="<%= slot.getId() %>" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
+                                <a class="btn-action btn-receipt" title="View Receipt" href="${pageContext.request.contextPath}/custom-requests/details?id=<%= customRequest.getRequestId() %>"><i class="fa-solid fa-receipt"></i></a>
+                                <a class="btn-action btn-edit" title="Schedule Delivery" href="${pageContext.request.contextPath}/delivery/edit?slotId=<%= customSlotId %>"><i class="fa-solid fa-clock"></i></a>
+                                <a class="btn-action btn-status" title="Change Status" href="${pageContext.request.contextPath}/custom-requests/edit?id=<%= customRequest.getRequestId() %>"><i class="fa-solid fa-gear"></i></a>
                             </td>
                         </tr>
                         <%
@@ -346,52 +333,7 @@
                             } else {
                         %>
                         <tr>
-                            <td><span class="badge bg-light text-dark border">C201</span></td>
-                            <td>Dinithi Jayasuriya</td>
-                            <td>21 Rose Avenue, Nugegoda</td>
-                            <td>2026-06-21</td>
-                            <td>11:15</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=C201"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=C201"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="C201" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-light text-dark border">C202</span></td>
-                            <td>Kavindu Wijesinghe</td>
-                            <td>67 Palm Street, Matara</td>
-                            <td>2026-06-22</td>
-                            <td>13:30</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=C202"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=C202"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="C202" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-light text-dark border">C203</span></td>
-                            <td>Hashini Dissanayake</td>
-                            <td>5 Station Road, Kurunegala</td>
-                            <td>2026-06-23</td>
-                            <td>15:00</td>
-                            <td><span class="badge-status status-pending">Pending</span></td>
-                            <td class="text-center slot-form-actions">
-                                <a class="btn-action btn-receipt" title="View" href="${pageContext.request.contextPath}/delivery/details?slotId=C203"><i class="fa-solid fa-receipt"></i></a>
-                                <a class="btn-action btn-status" title="Add Delivery Time" href="${pageContext.request.contextPath}/delivery/edit?slotId=C203"><i class="fa-solid fa-clock"></i></a>
-                                <form method="post" action="${pageContext.request.contextPath}/delivery/cancel" onsubmit="return confirm('Cancel this slot?');">
-                                    <input type="hidden" name="slotId" value="C203" />
-                                    <button class="btn-action btn-delete" title="Cancel" type="submit"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
+                            <td colspan="8" class="text-center py-4 text-muted">No custom cake requests found.</td>
                         </tr>
                         <%
                             }
@@ -403,6 +345,7 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

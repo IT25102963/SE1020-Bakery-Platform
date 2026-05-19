@@ -24,11 +24,28 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link active" href="/catalog">Catalog</a></li>
-                <li class="nav-item"><a class="nav-link" href="/standard-catalog">Manage Cakes</a></li>
+                <c:if test="${not empty sessionScope.admin}">
+                    <li class="nav-item"><a class="nav-link" href="/standard-catalog">Manage Cakes</a></li>
+                </c:if>
                 <li class="nav-item"><a class="nav-link" href="/custom-requests">Custom Requests</a></li>
                 <li class="nav-item"><a class="nav-link" href="/delivery">Delivery</a></li>
-                <li class="nav-item"><a class="nav-link" href="/bookings/products">Bookings</a></li>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.admin}">
+                        <li class="nav-item"><a class="nav-link" href="/bookings/my-orders">Dashboard</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="nav-item"><a class="nav-link" href="/bookings/my-orders">My Orders</a></li>
+                    </c:otherwise>
+                </c:choose>
                 <li class="nav-item"><a class="nav-link" href="/reviews/testimonials">Reviews</a></li>
+                <c:if test="${not empty sessionScope.user}">
+                    <li class="nav-item ms-lg-3">
+                        <a href="/bookings/checkout" class="nav-link cart-icon-wrapper" aria-label="Checkout">
+                            <i class="fa-solid fa-cart-shopping fa-lg"></i>
+                            <span class="cart-badge js-cart-count">${cartCount}</span>
+                        </a>
+                    </li>
+                </c:if>
 
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
@@ -90,13 +107,26 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     </c:if>
+    <c:if test="${not empty successMessage}">
+        <div class="alert alert-success alert-dismissible fade show glass-card border-0 mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> ${successMessage}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
 
     <section class="mb-5">
         <div class="row g-4">
             <c:forEach items="${cakes}" var="cake" varStatus="loop">
                 <div class="col-sm-6 col-lg-3">
                     <div class="product-card">
-                        <img src="/theme/img/shop/product-${(loop.index % 12) + 1}.jpg" alt="${cake.name}">
+                        <c:choose>
+                            <c:when test="${not empty cake.imageUrl}">
+                                <img src="${cake.imageUrl}" alt="${cake.name}">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="/theme/img/shop/product-${(loop.index % 12) + 1}.jpg" alt="${cake.name}">
+                            </c:otherwise>
+                        </c:choose>
                         <div class="product-card-body">
                             <h6>${cake.name}</h6>
                             <p class="product-price">LKR ${cake.price}</p>
@@ -105,13 +135,28 @@
 
                             <c:choose>
                                 <c:when test="${not empty sessionScope.user}">
-                                    <a href="#custom-request" class="btn btn-primary w-100">
-                                        <i class="fa-solid fa-cart-shopping me-2"></i> Buy Now
-                                    </a>
+                                    <div class="d-grid gap-2">
+                                        <form action="/bookings/cart/buy-now" method="post">
+                                            <input type="hidden" name="cakeName" value="${cake.name}">
+                                            <input type="hidden" name="unitPrice" value="${cake.price}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fa-solid fa-bolt me-2"></i> Buy Now
+                                            </button>
+                                        </form>
+                                        <form action="/bookings/cart/add-from-catalog" method="post" class="js-add-to-cart-form" data-ajax-action="/bookings/cart/add-ajax">
+                                            <input type="hidden" name="cakeName" value="${cake.name}">
+                                            <input type="hidden" name="unitPrice" value="${cake.price}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-warning w-100">
+                                                <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                    </div>
                                 </c:when>
                                 <c:when test="${not empty sessionScope.admin}">
-                                    <a href="/admin/profile" class="btn btn-primary w-100">
-                                        <i class="fa-solid fa-user-shield me-2"></i> Admin View
+                                    <a href="/bookings/my-orders" class="btn btn-primary w-100">
+                                        <i class="fa-solid fa-user-shield me-2"></i> Manage Orders
                                     </a>
                                 </c:when>
                                 <c:otherwise>
@@ -134,7 +179,7 @@
                 <p class="mb-0 text-white-50">Have a specific design in mind? Share your theme, flavors, and tiers with us.</p>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="${not empty sessionScope.user ? '/profile' : '/register'}" class="btn btn-light btn-lg px-5 rounded-pill fw-bold">Start Request</a>
+                <a href="/custom-requests/submit" class="btn btn-light btn-lg px-5 rounded-pill fw-bold">Start Request</a>
             </div>
         </div>
     </div>

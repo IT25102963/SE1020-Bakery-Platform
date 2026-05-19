@@ -11,13 +11,13 @@
 <body>
 <nav class="navbar navbar-expand-lg cake-navbar">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/bookings/products}">
+        <a class="navbar-brand" th:href="@{/catalog}">
             <img th:src="@{/theme/img/logo.png}" alt="CakeForge" class="brand-logo">
             <span>CakeForge</span>
         </a>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/bookings/products}">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/catalog}">Catalog</a></li>
                 <li class="nav-item"><a class="nav-link active" th:href="@{/bookings/my-orders}">Bookings</a></li>
             </ul>
         </div>
@@ -27,11 +27,18 @@
 <header class="page-header container">
     <div class="d-flex justify-content-between align-items-end">
         <div>
-            <h1>Dashboard</h1>
-            <p>Manage customer orders and delivery readiness.</p>
+            <h1 th:text="${session.admin != null} ? 'Dashboard' : 'My Bookings'">My Bookings</h1>
+            <p th:text="${session.admin != null} ? 'Manage customer orders and delivery readiness.' : 'Track your placed orders and receipts.'">
+                Track your placed orders and receipts.
+            </p>
         </div>
         <div class="mb-2">
-            <a th:href="@{/bookings/products}" class="btn btn-warning rounded-pill"><i class="fa-solid fa-plus me-2"></i> New Catalog Order</a>
+            <a th:if="${session.user != null}" th:href="@{/catalog}" class="btn btn-warning rounded-pill">
+                <i class="fa-solid fa-plus me-2"></i> Place New Order
+            </a>
+            <a th:if="${session.admin != null}" th:href="@{/catalog}" class="btn btn-light border rounded-pill">
+                <i class="fa-solid fa-house me-2"></i> Back to Catalog
+            </a>
         </div>
     </div>
 </header>
@@ -95,32 +102,51 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="booking : ${bookings}">
+                    <tr th:each="booking : ${bookings}"
+                        th:with="statusText=${booking.status != null ? booking.status : ''},
+                                 isPending=${#strings.equalsIgnoreCase(statusText, 'Pending')},
+                                 isConfirmed=${#strings.equalsIgnoreCase(statusText, 'Confirmed') or #strings.equalsIgnoreCase(statusText, 'Ready for Delivery') or #strings.equalsIgnoreCase(statusText, 'Ready')},
+                                 isDelivered=${#strings.equalsIgnoreCase(statusText, 'Delivered') or #strings.equalsIgnoreCase(statusText, 'Completed')},
+                                 isDeleteRequested=${#strings.equalsIgnoreCase(statusText, 'Delete Requested')}">
                         <td><span class="badge bg-light text-dark border fw-bold" th:text="${booking.bookingId}"></span></td>
                         <td>
                             <div class="fw-bold" th:text="${booking.customerName}"></div>
                             <small class="text-muted" th:text="${booking.phone}"></small>
                         </td>
                         <td>
-                            <div class="fw-bold text-pink" th:text="${booking.cakeName}"></div>
-                            <small class="text-muted" th:text="${'Qty: ' + booking.quantity}"></small>
+                            <div class="fw-bold text-pink" th:text="${booking.cakeName != null ? booking.cakeName : '-'}"></div>
+                            <small class="text-muted" th:text="${'Qty: ' + (booking.quantity != null ? booking.quantity : 0)}"></small>
                         </td>
                         <td>
                             <div th:text="${booking.deliveryDate != null ? #temporals.format(booking.deliveryDate, 'MMM dd, yyyy') : '-'}"></div>
                         </td>
-                        <td class="fw-bold" th:text="${'LKR ' + #numbers.formatDecimal(booking.totalPrice, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td class="fw-bold"
+                            th:text="${booking.totalPrice != null ? 'LKR ' + #numbers.formatDecimal(booking.totalPrice, 1, 'COMMA', 2, 'POINT') : 'LKR 0.00'}"></td>
                         <td>
                             <span th:class="${'badge-status ' + 
-                                (booking.status == 'Pending' ? 'status-pending' : 
-                                 booking.status == 'Confirmed' || booking.status == 'Ready for Delivery' || booking.status == 'Ready' ? 'status-confirmed' :
-                                 booking.status == 'Delivered' ? 'status-delivered' : 'status-cancelled')}"
-                                  th:text="${booking.status}"></span>
+                                (isPending ? 'status-pending' :
+                                 isConfirmed ? 'status-confirmed' :
+                                 isDelivered ? 'status-delivered' :
+                                 isDeleteRequested ? 'status-cancelled' : 'status-cancelled')}"
+                                  th:text="${statusText != '' ? statusText : 'Pending'}"></span>
                         </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center">
                                 <a th:href="@{/bookings/receipt/{id}(id=${booking.bookingId})}" class="btn-action btn-receipt" title="Receipt"><i class="fa-solid fa-receipt"></i></a>
-                                <a th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}" class="btn-action btn-edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                                <a th:if="${session.admin != null}" th:href="@{/bookings/status/{id}(id=${booking.bookingId})}" class="btn-action btn-status" title="Update Status"><i class="fa-solid fa-gear"></i></a>
+                                <a th:if="${session.admin != null}" th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete" title="Reject / Delete" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                                <a th:if="${session.user != null and isPending}"
+                                   th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete"
+                                   title="Delete Pending Order"
+                                   onclick="return confirm('Delete this pending order?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                                <a th:if="${session.user != null and !isPending}"
+                                   th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}" class="btn-action btn-delete"
+                                   title="Request Delete"
+                                   onclick="return confirm('Send delete request to admin?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>

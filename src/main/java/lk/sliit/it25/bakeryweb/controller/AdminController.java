@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin") // This adds "/admin" to the start of all URLs in this file!
@@ -52,7 +53,7 @@ public class AdminController {
         if (loggedInAdmin != null) {
             session.setAttribute("admin", loggedInAdmin); // Saving as "admin"!
             session.removeAttribute("user");
-            return "redirect:/catalog"; // We will build the cake-adding dashboard next
+            return "redirect:/standard-catalog";
         } else {
             model.addAttribute("error", "Invalid Admin Credentials!");
             return "admin/login";
@@ -68,5 +69,49 @@ public class AdminController {
 
         model.addAttribute("admin", loggedInAdmin);
         return "admin/profile";
+    }
+
+    @GetMapping("/editProfile")
+    public String showEditAdminProfile(HttpSession session, Model model) {
+        Admin loggedInAdmin = (Admin) session.getAttribute("admin");
+        if (loggedInAdmin == null) {
+            return "redirect:/admin/login";
+        }
+
+        model.addAttribute("admin", loggedInAdmin);
+        return "admin/editProfile";
+    }
+
+    @PostMapping("/editProfile")
+    public String updateAdminProfile(
+            @RequestParam("name") String name,
+            @RequestParam(value = "password", required = false) String password,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Admin loggedInAdmin = (Admin) session.getAttribute("admin");
+        if (loggedInAdmin == null) {
+            return "redirect:/admin/login";
+        }
+
+        String updatedName = name == null ? "" : name.trim();
+        if (updatedName.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Name cannot be empty.");
+            return "redirect:/admin/editProfile";
+        }
+
+        String updatedPassword = (password == null || password.trim().isEmpty())
+                ? loggedInAdmin.getPassword()
+                : password.trim();
+
+        Admin updatedAdmin = new Admin(updatedName, loggedInAdmin.getEmail(), updatedPassword);
+        boolean updated = repository.update(updatedAdmin);
+        if (!updated) {
+            redirectAttributes.addFlashAttribute("error", "Admin profile update failed.");
+            return "redirect:/admin/editProfile";
+        }
+
+        session.setAttribute("admin", updatedAdmin);
+        redirectAttributes.addFlashAttribute("success", "Admin profile updated successfully.");
+        return "redirect:/admin/profile";
     }
 }

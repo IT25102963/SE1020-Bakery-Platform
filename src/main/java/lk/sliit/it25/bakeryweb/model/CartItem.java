@@ -42,6 +42,8 @@ public class CartItem {
     }
 
     public BigDecimal getSubTotal() {
-        return unitPrice.multiply(new BigDecimal(quantity));
+        BigDecimal safeUnitPrice = unitPrice == null ? BigDecimal.ZERO : unitPrice;
+        int safeQuantity = quantity == null || quantity < 1 ? 1 : quantity;
+        return safeUnitPrice.multiply(new BigDecimal(safeQuantity));
     }
 }

@@ -25,11 +25,7 @@ public class DeliveryScheduleService {
     }
 
     public Optional<DeliverySlot> getSlotById(String id) {
-        Optional<DeliverySlot> stored = repository.findById(id);
-        if (stored.isPresent()) {
-            return stored;
-        }
-        return getDemoSlotById(id);
+        return repository.findById(id);
     }
 
     public boolean scheduleTime(String bookingId, String customerName, String address, String deliveryDate, String deliveryTime) {
@@ -66,23 +62,30 @@ public class DeliveryScheduleService {
         return updated;
     }
 
+    public boolean upsertSlot(String id, String customerName, String address, String deliveryDate, String deliveryTime) {
+        String normalizedId = id == null ? "" : id.trim().toUpperCase();
+        if (normalizedId.isBlank()) {
+            return false;
+        }
+
+        if (repository.findById(normalizedId).isPresent()) {
+            return updateSlot(normalizedId, customerName, address, deliveryDate, deliveryTime);
+        }
+
+        DeliverySlot slot = new DeliverySlot(
+                normalizedId,
+                customerName.trim(),
+                address.trim(),
+                deliveryDate,
+                deliveryTime
+        );
+        repository.save(slot);
+        orderBookingDateSyncRepository.updateDeliveryDateByBookingId(normalizedId, deliveryDate);
+        return true;
+    }
+
     public boolean cancelSlot(String id) {
         return repository.deleteById(id);
     }
 
-    private Optional<DeliverySlot> getDemoSlotById(String id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        String normalized = id.trim().toUpperCase();
-        return switch (normalized) {
-            case "B104" -> Optional.of(new DeliverySlot("B104", "Nimal Perera", "12 Temple Road, Colombo 05", "2026-06-18", "10:30"));
-            case "B105" -> Optional.of(new DeliverySlot("B105", "Shehan Silva", "44 Lake Drive, Kandy", "2026-06-19", "14:00"));
-            case "B106" -> Optional.of(new DeliverySlot("B106", "Rashmi Fernando", "8 Beach Lane, Galle", "2026-06-20", "16:45"));
-            case "C201" -> Optional.of(new DeliverySlot("C201", "Dinithi Jayasuriya", "21 Rose Avenue, Nugegoda", "2026-06-21", "11:15"));
-            case "C202" -> Optional.of(new DeliverySlot("C202", "Kavindu Wijesinghe", "67 Palm Street, Matara", "2026-06-22", "13:30"));
-            case "C203" -> Optional.of(new DeliverySlot("C203", "Hashini Dissanayake", "5 Station Road, Kurunegala", "2026-06-23", "15:00"));
-            default -> Optional.empty();
-        };
-    }
 }

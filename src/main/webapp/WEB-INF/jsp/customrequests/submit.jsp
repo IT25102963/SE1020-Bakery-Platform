@@ -29,13 +29,13 @@
 
     <nav class="navbar navbar-expand-lg mb-5">
         <div class="container-fluid px-5">
-            <a class="navbar-brand d-flex align-items-center" href="#">
+            <a class="navbar-brand d-flex align-items-center" href="/catalog">
                 <span class="fs-3 me-2">🧁</span>
                 <span class="text-dark">cake</span>CakeForge
             </a>
             <div class="ms-auto d-flex align-items-center">
-                <a href="#" class="nav-link nav-link-custom">Catalog</a>
-                <a href="#" class="nav-link nav-link-custom">Bookings</a>
+                <a href="/catalog" class="nav-link nav-link-custom">Catalog</a>
+                <a href="/bookings/my-orders" class="nav-link nav-link-custom">My Orders</a>
                 <a href="/custom-requests" class="nav-link nav-link-custom nav-pill-active">Custom Requests</a>
             </div>
         </div>
@@ -64,7 +64,8 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Customer Name</label>
-                                <input type="text" name="customerName" class="form-control" placeholder="John Doe" required>
+                                <input type="text" class="form-control" value="${customerName}" readonly>
+                                <input type="hidden" name="customerName" value="${customerName}">
                             </div>
 
                             <div class="mb-3">

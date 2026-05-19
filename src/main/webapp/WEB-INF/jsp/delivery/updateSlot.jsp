@@ -14,12 +14,12 @@
 <body>
 <nav class="navbar navbar-expand-lg cake-navbar">
     <div class="container">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}/bookings/products">
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/catalog">
             <span>CakeForge</span>
         </a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/products">Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/catalog">Catalog</a></li>
                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/bookings/my-orders">Bookings</a></li>
                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/delivery">Delivery</a></li>
             </ul>
@@ -49,7 +49,7 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Address</label>
-                <input class="form-control" type="text" name="address" value="<%= slot.getAddress() %>" required />
+                <input class="form-control" type="text" name="address" value="<%= slot.getAddress() %>" readonly />
             </div>
             <div class="col-md-6">
                 <label class="form-label">Delivery Date</label>

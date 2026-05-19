@@ -35,8 +35,8 @@
                 <span class="text-dark">cake</span>CakeForge
             </a>
             <div class="ms-auto d-flex align-items-center">
-                <a href="#" class="nav-link nav-link-custom">Catalog</a>
-                <a href="#" class="nav-link nav-link-custom">Bookings</a>
+                <a href="/catalog" class="nav-link nav-link-custom">Catalog</a>
+                <a href="/bookings/my-orders" class="nav-link nav-link-custom">Dashboard</a>
                 <a href="/custom-requests" class="nav-link nav-link-custom nav-pill-active">Custom Requests</a>
             </div>
         </div>
@@ -52,8 +52,8 @@
                                 <i class="bi bi-pencil-square fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="fw-bold mb-0" style="color: #1e293b;">Edit Request</h3>
-                                <p class="text-muted mb-0">Update your custom cake specifications.</p>
+                                <h3 class="fw-bold mb-0" style="color: #1e293b;">Update Request Status</h3>
+                                <p class="text-muted mb-0">Admin can update status only.</p>
                             </div>
                         </div>
 
@@ -61,7 +61,6 @@
                         <% if(req != null) { %>
                         <form action="/custom-requests/edit" method="post">
                             <input type="hidden" name="requestId" value="<%= req.getRequestId() %>">
-                            <input type="hidden" name="customerName" value="<%= req.getCustomerName() %>">
 
                             <div class="mb-4 p-3 rounded-3 bg-light border-0">
                                 <div class="row">
@@ -78,20 +77,21 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Number of Tiers</label>
-                                <input type="number" name="tiers" value="<%= req.getTiers() %>" class="form-control" required>
+                                <input type="text" value="<%= req.getTiers() %>" class="form-control" readonly>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Cake Theme</label>
-                                <input type="text" name="theme" value="<%= req.getTheme() %>" class="form-control" required>
+                                <input type="text" value="<%= req.getTheme() %>" class="form-control" readonly>
                             </div>
 
                             <div class="mb-4">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="Pending" <%= req.getStatus().equals("Pending") ? "selected" : "" %>>Pending</option>
-                                    <option value="Approved" <%= req.getStatus().equals("Approved") ? "selected" : "" %>>Approved</option>
+                                    <option value="Confirmed" <%= (req.getStatus().equals("Confirmed") || req.getStatus().equals("Approved")) ? "selected" : "" %>>Confirmed</option>
                                     <option value="Completed" <%= req.getStatus().equals("Completed") ? "selected" : "" %>>Completed</option>
+                                    <option value="Delete Requested" <%= req.getStatus().equals("Delete Requested") ? "selected" : "" %>>Delete Requested</option>
                                 </select>
                             </div>
 

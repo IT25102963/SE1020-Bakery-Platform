@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="lk.sliit.it25.bakeryweb.customrequests.CustomRequest" %>
+<%@ page import="lk.sliit.it25.bakeryweb.model.Customer" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,6 +58,11 @@
 
     <%
         List<CustomRequest> requests = (List<CustomRequest>) request.getAttribute("requests");
+        Boolean isAdminAttr = (Boolean) request.getAttribute("isAdmin");
+        boolean isAdmin = isAdminAttr != null && isAdminAttr;
+        Customer loggedInUser = (Customer) session.getAttribute("user");
+        String successMessage = (String) request.getAttribute("successMessage");
+        String errorMessage = (String) request.getAttribute("errorMessage");
         int totalRequests = 0;
         int completedRequests = 0;
         if(requests != null) {
@@ -69,13 +75,12 @@
 
     <nav class="navbar navbar-expand-lg mb-5">
         <div class="container-fluid px-5">
-            <a class="navbar-brand d-flex align-items-center" href="#">
+            <a class="navbar-brand d-flex align-items-center" href="/catalog">
                 <span class="fs-3 me-2">🧁</span>
                 <span class="text-dark">cake</span>CakeForge
             </a>
             <div class="ms-auto d-flex align-items-center">
-                <a href="#" class="nav-link nav-link-custom">Catalog</a>
-                <a href="#" class="nav-link nav-link-custom">Bookings</a>
+                <a href="/catalog" class="nav-link nav-link-custom">Catalog</a>
                 <a href="/custom-requests" class="nav-link nav-link-custom nav-pill-active">Custom Requests</a>
             </div>
         </div>
@@ -85,11 +90,19 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="dashboard-heading mb-2">Dashboard</h1>
-                <p class="dashboard-sub">Manage custom cake requests and specifications.</p>
+                <h1 class="dashboard-heading mb-2"><%= isAdmin ? "Dashboard" : "My Custom Requests" %></h1>
+                <p class="dashboard-sub"><%= isAdmin ? "Manage custom cake requests and specifications." : "Track your submitted custom cake requests." %></p>
             </div>
+            <% if(!isAdmin && loggedInUser != null) { %>
             <a href="/custom-requests/submit" class="btn text-white px-4 py-2" style="background-color: #fb7185; border-radius: 10px; font-weight: 600;">+ New Request</a>
+            <% } %>
         </div>
+        <% if(successMessage != null && !successMessage.isBlank()) { %>
+        <div class="alert alert-success mb-4"><%= successMessage %></div>
+        <% } %>
+        <% if(errorMessage != null && !errorMessage.isBlank()) { %>
+        <div class="alert alert-danger mb-4"><%= errorMessage %></div>
+        <% } %>
 
         <div class="row mb-5">
             <div class="col-md-6">
@@ -146,8 +159,9 @@
                             if(requests != null && !requests.isEmpty()) {
                                 for(CustomRequest req : requests) {
                                     String statusClass = "status-pending";
-                                    if(req.getStatus().equals("Approved")) statusClass = "status-approved";
+                                    if(req.getStatus().equals("Approved") || req.getStatus().equals("Confirmed")) statusClass = "status-approved";
                                     else if(req.getStatus().equals("Completed")) statusClass = "status-completed";
+                                    else if(req.getStatus().equals("Delete Requested")) statusClass = "status-pending";
                         %>
                         <tr>
                             <td><span class="badge bg-light text-dark border px-2 py-1">#<%= req.getRequestId() %></span></td>
@@ -158,12 +172,23 @@
                                 <span class="status-pill <%= statusClass %>"><%= req.getStatus() %></span>
                             </td>
                             <td>
-                                <a href="/custom-requests/edit?id=<%= req.getRequestId() %>" class="action-btn btn-edit" title="Edit">
+                                <a href="/custom-requests/details?id=<%= req.getRequestId() %>" class="action-btn btn-edit" title="Receipt">
                                     <i class="bi bi-file-earmark-text-fill"></i>
+                                </a>
+                                <% if(isAdmin) { %>
+                                <a href="/custom-requests/edit?id=<%= req.getRequestId() %>" class="action-btn btn-edit" title="Update Status">
+                                    <i class="bi bi-gear-fill"></i>
                                 </a>
                                 <a href="/custom-requests/delete?id=<%= req.getRequestId() %>" class="action-btn btn-delete" title="Delete" onclick="return confirm('Are you sure you want to delete this request?');">
                                     <i class="bi bi-trash-fill"></i>
                                 </a>
+                                <% } else { %>
+                                <a href="/custom-requests/request-delete?id=<%= req.getRequestId() %>" class="action-btn btn-delete"
+                                   title="<%= "Pending".equalsIgnoreCase(req.getStatus()) ? "Delete Pending Request" : "Request Delete" %>"
+                                   onclick="return confirm('<%= "Pending".equalsIgnoreCase(req.getStatus()) ? "Delete this pending request?" : "Send delete request to admin?" %>');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                                <% } %>
                             </td>
                         </tr>
                         <%
