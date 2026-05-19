@@ -6,13 +6,19 @@ public class Cake {
     private double price;
     private String category;
     private String description;
+    private String imageUrl;
 
     public Cake(int id, String name, double price, String category, String description) {
+        this(id, name, price, category, description, null);
+    }
+
+    public Cake(int id, String name, double price, String category, String description, String imageUrl) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
         this.description = description;
+        this.imageUrl = imageUrl;
     }
 
     public int getId() {
@@ -53,5 +59,13 @@ public class Cake {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
